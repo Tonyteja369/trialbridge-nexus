@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -20,7 +21,6 @@ import { Route as AuthenticatedParticipantsRouteImport } from './routes/_authent
 import { Route as AuthenticatedQuantumLabRouteImport } from './routes/_authenticated/quantum-lab'
 import { Route as AuthenticatedResearchRouteImport } from './routes/_authenticated/research'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
-import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAboutRouteImport } from './routes/_protected/about'
 import { Route as ProtectedPlatformRouteImport } from './routes/_protected/platform'
 import { Route as ProtectedSecurityRouteImport } from './routes/_protected/security'
@@ -30,6 +30,11 @@ import { Route as AuthenticatedDiseasesSlugRouteImport } from './routes/_authent
 import { Route as AuthenticatedStudiesIndexRouteImport } from './routes/_authenticated/studies.index'
 import { Route as AuthenticatedStudiesStudyIdRouteImport } from './routes/_authenticated/studies.$studyId'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -84,11 +89,6 @@ const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
 const ProtectedAboutRoute = ProtectedAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -136,7 +136,7 @@ const AuthenticatedStudiesStudyIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof ProtectedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/genomics': typeof AuthenticatedGenomicsRoute
@@ -156,7 +156,7 @@ export interface FileRoutesByFullPath {
   '/studies/': typeof AuthenticatedStudiesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof ProtectedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/genomics': typeof AuthenticatedGenomicsRoute
@@ -177,6 +177,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/auth': typeof AuthRoute
@@ -191,7 +192,6 @@ export interface FileRoutesById {
   '/_protected/about': typeof ProtectedAboutRoute
   '/_protected/platform': typeof ProtectedPlatformRoute
   '/_protected/security': typeof ProtectedSecurityRoute
-  '/_protected/': typeof ProtectedIndexRoute
   '/_authenticated/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/_authenticated/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/_authenticated/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -241,6 +241,7 @@ export interface FileRouteTypes {
     | '/studies'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/_protected'
     | '/auth'
@@ -255,7 +256,6 @@ export interface FileRouteTypes {
     | '/_protected/about'
     | '/_protected/platform'
     | '/_protected/security'
-    | '/_protected/'
     | '/_authenticated/candidates/$candidateId'
     | '/_authenticated/diseases/$slug'
     | '/_authenticated/studies/$studyId'
@@ -264,6 +264,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
@@ -271,6 +272,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -347,13 +355,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/tasks'
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_protected/': {
-      id: '/_protected/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
     }
     '/_protected/about': {
       id: '/_protected/about'
@@ -454,14 +455,12 @@ interface ProtectedRouteRouteChildren {
   ProtectedAboutRoute: typeof ProtectedAboutRoute
   ProtectedPlatformRoute: typeof ProtectedPlatformRoute
   ProtectedSecurityRoute: typeof ProtectedSecurityRoute
-  ProtectedIndexRoute: typeof ProtectedIndexRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedAboutRoute: ProtectedAboutRoute,
   ProtectedPlatformRoute: ProtectedPlatformRoute,
   ProtectedSecurityRoute: ProtectedSecurityRoute,
-  ProtectedIndexRoute: ProtectedIndexRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -469,6 +468,7 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
