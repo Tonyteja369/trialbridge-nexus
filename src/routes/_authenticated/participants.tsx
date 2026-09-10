@@ -7,13 +7,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/participants")({
   head: () => ({
     meta: [
-      { title: "Participant registry — Diagnosphere.X" },
+      { title: "Participant registry — ClinQSphereX" },
       {
         name: "description",
         content:
           "De-identified participant registry used for study screening, with contact consent and recorded clinical attributes.",
       },
-      { property: "og:title", content: "Participant registry — Diagnosphere.X" },
+      { property: "og:title", content: "Participant registry — ClinQSphereX" },
       { property: "og:description", content: "De-identified registry records used for study screening." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

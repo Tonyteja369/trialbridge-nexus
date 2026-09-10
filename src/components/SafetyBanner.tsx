@@ -5,7 +5,7 @@ export function SafetyBanner({ compact = false }: { compact?: boolean }) {
     <div className="flex gap-3 rounded-xl border border-primary/25 bg-primary/10 p-4 text-sm backdrop-blur">
       <ShieldAlert className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
       <p className="text-foreground/90">
-        <strong className="font-semibold">Screening support only.</strong> Diagnosphere.X ranks
+        <strong className="font-semibold">Screening support only.</strong> ClinQSphereX ranks
         potentially eligible candidates from recorded data. It produces model predictions, not a
         clinical diagnosis, and does not determine eligibility.
         {!compact &&

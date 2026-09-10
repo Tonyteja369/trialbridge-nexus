@@ -11,13 +11,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/studies/$studyId")({
   head: () => ({
     meta: [
-      { title: "Study workspace — Diagnosphere.X" },
+      { title: "Study workspace — ClinQSphereX" },
       {
         name: "description",
         content:
           "Eligibility criteria, screening shortlist, human review pipeline and site allocation for a single clinical study.",
       },
-      { property: "og:title", content: "Study workspace — Diagnosphere.X" },
+      { property: "og:title", content: "Study workspace — ClinQSphereX" },
       { property: "og:description", content: "Screening, review and site allocation for one study." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
