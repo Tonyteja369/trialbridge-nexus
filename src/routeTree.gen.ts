@@ -22,6 +22,8 @@ import { Route as AuthenticatedOperationsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedParticipantsRouteImport } from './routes/_authenticated/participants'
 import { Route as AuthenticatedQuantumLabRouteImport } from './routes/_authenticated/quantum-lab'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as DiseasesIndexRouteImport } from './routes/diseases.index'
+import { Route as DiseasesSlugRouteImport } from './routes/diseases.$slug'
 import { Route as AuthenticatedCandidatesCandidateIdRouteImport } from './routes/_authenticated/candidates.$candidateId'
 import { Route as AuthenticatedStudiesIndexRouteImport } from './routes/_authenticated/studies.index'
 import { Route as AuthenticatedStudiesStudyIdRouteImport } from './routes/_authenticated/studies.$studyId'
@@ -91,6 +93,16 @@ const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DiseasesIndexRoute = DiseasesIndexRouteImport.update({
+  id: '/diseases/',
+  path: '/diseases/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiseasesSlugRoute = DiseasesSlugRouteImport.update({
+  id: '/diseases/$slug',
+  path: '/diseases/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCandidatesCandidateIdRoute =
   AuthenticatedCandidatesCandidateIdRouteImport.update({
     id: '/candidates/$candidateId',
@@ -123,6 +135,8 @@ export interface FileRoutesByFullPath {
   '/participants': typeof AuthenticatedParticipantsRoute
   '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/diseases/$slug': typeof DiseasesSlugRoute
+  '/diseases/': typeof DiseasesIndexRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
   '/studies/': typeof AuthenticatedStudiesIndexRoute
@@ -140,6 +154,8 @@ export interface FileRoutesByTo {
   '/participants': typeof AuthenticatedParticipantsRoute
   '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/diseases/$slug': typeof DiseasesSlugRoute
+  '/diseases': typeof DiseasesIndexRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
   '/studies': typeof AuthenticatedStudiesIndexRoute
@@ -159,6 +175,8 @@ export interface FileRoutesById {
   '/_authenticated/participants': typeof AuthenticatedParticipantsRoute
   '/_authenticated/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/diseases/$slug': typeof DiseasesSlugRoute
+  '/diseases/': typeof DiseasesIndexRoute
   '/_authenticated/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/_authenticated/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
   '/_authenticated/studies/': typeof AuthenticatedStudiesIndexRoute
@@ -178,6 +196,8 @@ export interface FileRouteTypes {
     | '/participants'
     | '/quantum-lab'
     | '/tasks'
+    | '/diseases/$slug'
+    | '/diseases/'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
     | '/studies/'
@@ -195,6 +215,8 @@ export interface FileRouteTypes {
     | '/participants'
     | '/quantum-lab'
     | '/tasks'
+    | '/diseases/$slug'
+    | '/diseases'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
     | '/studies'
@@ -213,6 +235,8 @@ export interface FileRouteTypes {
     | '/_authenticated/participants'
     | '/_authenticated/quantum-lab'
     | '/_authenticated/tasks'
+    | '/diseases/$slug'
+    | '/diseases/'
     | '/_authenticated/candidates/$candidateId'
     | '/_authenticated/studies/$studyId'
     | '/_authenticated/studies/'
@@ -226,6 +250,8 @@ export interface RootRouteChildren {
   PlatformRoute: typeof PlatformRoute
   ResearchRoute: typeof ResearchRoute
   SecurityRoute: typeof SecurityRoute
+  DiseasesSlugRoute: typeof DiseasesSlugRoute
+  DiseasesIndexRoute: typeof DiseasesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -321,6 +347,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/diseases/': {
+      id: '/diseases/'
+      path: '/diseases'
+      fullPath: '/diseases/'
+      preLoaderRoute: typeof DiseasesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diseases/$slug': {
+      id: '/diseases/$slug'
+      path: '/diseases/$slug'
+      fullPath: '/diseases/$slug'
+      preLoaderRoute: typeof DiseasesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/candidates/$candidateId': {
       id: '/_authenticated/candidates/$candidateId'
       path: '/candidates/$candidateId'
@@ -381,6 +421,8 @@ const rootRouteChildren: RootRouteChildren = {
   PlatformRoute: PlatformRoute,
   ResearchRoute: ResearchRoute,
   SecurityRoute: SecurityRoute,
+  DiseasesSlugRoute: DiseasesSlugRoute,
+  DiseasesIndexRoute: DiseasesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

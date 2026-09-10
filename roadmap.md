@@ -8,6 +8,12 @@
 - [x] Procedural WebGL diagnostic sphere hero (R3F/Drei/Three) with static + reduced-motion fallback
 - [x] Language rules: "potentially eligible", "researcher review required", "model prediction", no compliance claims
 
+## Done — disease-centred website
+- [x] Disease explorer (8 areas) + per-disease pages at /diseases and /diseases/$slug
+- [x] Live ClinicalTrials.gov v2 discovery (no fabricated counts; error/empty states)
+- [x] Home rebuilt: hero, challenge, disease explorer, heart demo, story flow, benchmark (Not evaluated), data-scale with sources, genomics chain, explainability, human review, governance, CTA
+- [x] Provenance tags: live / reference / controlled / synthetic
+
 ## Next — screening + evidence honesty
 - [ ] Three-state criterion display: MATCH / NOT MATCHED / UNKNOWN (never coerce UNKNOWN)
 - [ ] Criterion → evidence value → source → timestamp → result on candidate review
