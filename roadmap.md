@@ -8,6 +8,7 @@
 - [ ] Scientific visualization upgrades for candidate review and Quantum Lab
 - [x] Footer creator credits and updated public navigation
 - [x] Desktop/mobile, interaction, accessibility, console, and route verification
+- [x] Reusable liquid-glass tokens and components for navigation, cards, dialogs, popovers, and evidence panels
 
 ## Now — rebrand + design system (this turn)
 - [x] Rename ClinQSphereX → ClinQSphereX everywhere (nav, titles, metadata, copy)

@@ -9,6 +9,8 @@ import { SafetyBanner } from "@/components/SafetyBanner";
 import { toast } from "sonner";
 import { OutcomeBadge } from "@/components/OutcomeBadge";
 import { ErrorState, LoadingState } from "@/components/DataState";
+import { EvidencePanel } from "@/components/EvidencePanel";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/candidates/$candidateId")({
   head: () => ({
@@ -189,12 +191,12 @@ function CandidatePage() {
           </dl>
         </div>
 
-        <div className="surface p-5 lg:col-span-2">
-          <h2 className="text-base font-semibold">Why this candidate was suggested</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Each row shows the recorded value, the protocol requirement and the contribution to the
-            score. Missing data is never treated as an automatic rejection.
-          </p>
+        <EvidencePanel
+          className="lg:col-span-2"
+          title="Why this candidate was suggested"
+          description="Each row shows the recorded value, the protocol requirement and the contribution to the score. Missing data is never treated as an automatic rejection."
+          footer="Contributions describe how each criterion affected this score. They do not establish causality, and UNKNOWN criteria are never counted as a match."
+        >
           {explanation.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
               No screening explanation recorded yet. Run screening on the study to generate one.
@@ -218,11 +220,7 @@ function CandidatePage() {
               ))}
             </ul>
           )}
-          <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
-            Contributions describe how each criterion affected this score. They do not establish
-            causality, and UNKNOWN criteria are never counted as a match.
-          </p>
-        </div>
+        </EvidencePanel>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
@@ -237,14 +235,15 @@ function CandidatePage() {
           />
           <div className="mt-3 flex flex-wrap gap-2">
             {decisions.map((d) => (
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 key={d.status}
                 onClick={() => decide.mutate(d.status)}
                 disabled={decide.isPending}
-                className="rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-muted disabled:opacity-60"
               >
                 {d.label}
-              </button>
+              </Button>
             ))}
           </div>
           {candidate.reviewed_at && (
@@ -262,14 +261,16 @@ function CandidatePage() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {["sent", "granted", "declined", "revoked"].map((s) => (
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 key={s}
                 onClick={() => consentMutation.mutate(s)}
                 disabled={consentMutation.isPending}
-                className="rounded-md border border-border px-3 py-1.5 text-sm capitalize hover:bg-muted disabled:opacity-60"
+                className="capitalize"
               >
                 Mark {s}
-              </button>
+              </Button>
             ))}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
@@ -289,13 +290,14 @@ function CandidatePage() {
             ))}
             {visits.length === 0 && <li className="text-muted-foreground">No visits yet.</li>}
           </ul>
-          <button
+          <Button
+            size="sm"
             onClick={() => scheduleVisit.mutate()}
             disabled={scheduleVisit.isPending}
-            className="mt-3 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+            className="mt-3"
           >
             Schedule screening visit
-          </button>
+          </Button>
         </div>
       </section>
 
