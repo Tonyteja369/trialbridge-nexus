@@ -96,7 +96,7 @@ function ScreeningVisual() {
     { label: "Reviewed", value: 61 },
     { label: "Consented", value: 38 },
   ];
-  const max = stages[0].value;
+  const max = Math.max(...stages.map((s) => s.value));
   return (
     <figure className="surface-strong p-6">
       <figcaption className="text-sm font-medium">
