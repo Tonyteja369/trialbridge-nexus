@@ -58,7 +58,7 @@ function CandidatePage() {
         .eq("id", candidateId)
         .maybeSingle();
       if (!candidate) throw new Error("Candidate not found");
-      const [{ data: consent }, { data: visits }] = await Promise.all([
+      const [{ data: consent }, { data: visits }, { data: events }] = await Promise.all([
         supabase
           .from("consents")
           .select("*")
@@ -70,8 +70,14 @@ function CandidatePage() {
           .select("*")
           .eq("participant_id", candidate.participant_id)
           .order("scheduled_at"),
+        supabase
+          .from("audit_log")
+          .select("*")
+          .eq("entity_id", candidateId)
+          .order("created_at", { ascending: false })
+          .limit(25),
       ]);
-      return { candidate, consent, visits: visits ?? [] };
+      return { candidate, consent, visits: visits ?? [], events: events ?? [] };
     },
   });
 
@@ -121,7 +127,8 @@ function CandidatePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading || !data) return <p className="text-sm text-muted-foreground">Loading candidate…</p>;
+  if (isLoading) return <LoadingState rows={3} label="Loading candidate" />;
+  if (!data) return <ErrorState message="This candidate could not be loaded." />;
   const { candidate, consent, visits } = data;
   const p = candidate.participants as any;
   const explanation = (candidate.explanation as any[]) ?? [];
@@ -188,23 +195,33 @@ function CandidatePage() {
             Each row shows the recorded value, the protocol requirement and the contribution to the
             score. Missing data is never treated as an automatic rejection.
           </p>
-          <ul className="mt-4 divide-y divide-border text-sm">
-            {explanation.map((e) => (
-              <li key={e.criterionId} className="flex items-start gap-3 py-2.5">
-                <OutcomeIcon outcome={e.outcome} />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium">{e.label}</p>
-                  <p className="text-xs text-muted-foreground">
-                    recorded: {e.observed} · required: {e.expected} · {e.kind}
-                    {e.hard ? " · hard rule" : " · soft rule"}
-                  </p>
-                </div>
-                <span className="tabular-nums text-muted-foreground">
-                  +{e.contribution}/{e.weight}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {explanation.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              No screening explanation recorded yet. Run screening on the study to generate one.
+            </p>
+          ) : (
+            <ul className="mt-4 divide-y divide-border text-sm">
+              {explanation.map((e) => (
+                <li key={e.criterionId} className="flex flex-wrap items-start gap-3 py-3">
+                  <OutcomeBadge outcome={e.outcome} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{e.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Evidence: {e.observed} · Required: {e.expected} · {e.kind}
+                      {e.hard ? " · hard rule" : " · soft rule"}
+                    </p>
+                  </div>
+                  <span className="tabular-nums text-muted-foreground">
+                    +{e.contribution}/{e.weight}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
+            Contributions describe how each criterion affected this score. They do not establish
+            causality, and UNKNOWN criteria are never counted as a match.
+          </p>
         </div>
       </section>
 
