@@ -38,15 +38,6 @@ const pipeline = [
   "Prediction",
 ];
 
-const metrics = [
-  "Accuracy",
-  "Precision",
-  "Recall",
-  "F1",
-  "ROC-AUC",
-  "Training time",
-  "Inference time",
-];
 
 function QuantumLab() {
   const { data, isLoading, error } = useQuery({
