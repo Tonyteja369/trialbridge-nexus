@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SafetyBanner } from "@/components/SafetyBanner";
 import { StatusPill } from "@/components/StatusPill";
+import { ResearchMap } from "@/components/ResearchMap";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -81,6 +82,26 @@ function Dashboard() {
           </div>
         ))}
       </div>
+
+      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <ResearchMap />
+        <div className="surface-strong p-5">
+          <p className="text-xs font-semibold uppercase text-primary">Research intelligence map</p>
+          <h2 className="mt-2 text-lg font-semibold">One connected operational record</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Studies connect candidate evidence, model output, consent, tasks and audited researcher
+            action without turning model suggestions into automatic decisions.
+          </p>
+          <dl className="mt-6 grid grid-cols-2 gap-3 text-sm">
+            {stats.map((s) => (
+              <div key={s.label} className="surface-soft p-3">
+                <dt className="text-xs text-muted-foreground">{s.label}</dt>
+                <dd className="mt-1 font-display text-xl font-semibold">{s.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="surface p-5">

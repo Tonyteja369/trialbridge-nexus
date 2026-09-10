@@ -5,6 +5,8 @@ import { DiseaseExplorer } from "@/components/DiseaseExplorer";
 import { TrialSearch } from "@/components/TrialSearch";
 import { OutcomeBadge } from "@/components/OutcomeBadge";
 import { ProvenanceTag } from "@/components/DataProvenance";
+import { BiomedicalVideo } from "@/components/BiomedicalVideo";
+import { HeartIntelligence } from "@/components/HeartIntelligence";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -152,39 +154,52 @@ function Landing() {
       <PublicNav />
       <main className="min-h-screen bg-background">
         {/* 1 — Hero */}
-        <section className="mx-auto grid max-w-6xl gap-12 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
-          <div>
-            <p className="text-sm font-medium text-primary">
-              Clinical Trial Recruitment, Participant &amp; Research Operations Platform
-            </p>
-            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.12] sm:text-[2.9rem]">
-              Finding the right clinical trial for the right patient shouldn't take weeks.
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-              ClinQSphereX connects clinical-trial information, patient-like research data, eligibility
-              criteria, machine learning and experimental quantum methods into one human-centered
-              research workflow.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/diseases/$slug"
-                params={{ slug: "heart-cardiovascular" }}
-                className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Explore heart disease trials
-              </Link>
-              <a
-                href="#how-it-works"
-                className="rounded-md border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-secondary"
-              >
-                See how it works
-              </a>
+        <section className="hero-environment">
+          <video
+            className="hero-background-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden
+          >
+            <source src="/__l5e/assets-v1/9095d4a7-61aa-4ef3-ab96-0be21168a30c/clinqspherex-biomedical-background.mp4" type="video/mp4" />
+          </video>
+          <div className="hero-environment-inner mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
+            <div className="relative z-10">
+              <p className="text-sm font-semibold uppercase text-hero-accent">
+                Clinical research intelligence
+              </p>
+              <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.12] text-hero-foreground sm:text-5xl lg:text-6xl">
+                Clinical research, connected by intelligence.
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-hero-muted sm:text-lg">
+                ClinQSphereX connects clinical-trial discovery, candidate screening, explainable AI and
+                experimental quantum machine learning in one human-centered research workflow.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  to="/platform"
+                  className="rounded-md bg-primary px-5 py-3 text-sm font-semibold uppercase text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Explore platform
+                </Link>
+                <Link
+                  to="/research"
+                  className="rounded-md border border-hero-accent/30 bg-hero/45 px-5 py-3 text-sm font-semibold uppercase text-hero-foreground backdrop-blur transition-colors hover:bg-hero-foreground/10"
+                >
+                  Explore research
+                </Link>
+              </div>
+              <div className="mt-10 max-w-2xl text-foreground">
+                <SafetyBanner compact />
+              </div>
             </div>
-            <div className="mt-10 max-w-xl">
-              <SafetyBanner />
+            <div className="relative z-10 lg:translate-y-6">
+              <BiomedicalVideo />
             </div>
           </div>
-          <RecruitmentFunnel />
         </section>
 
         {/* 2 — The research challenge */}
@@ -231,19 +246,23 @@ function Landing() {
         </section>
 
         {/* 4 + 5 — Heart demonstration and live trial discovery */}
-        <section aria-labelledby="heart" className="border-t border-border bg-secondary/40">
+        <section aria-labelledby="heart" className="cinematic-band border-t border-hero-accent/15">
           <div className="mx-auto max-w-6xl px-5 py-16">
-            <h2 id="heart" className="font-display text-2xl font-semibold">
-              Heart disease research intelligence
-            </h2>
-            <p className="mt-3 max-w-3xl text-muted-foreground">
-              Cardiovascular research is the primary demonstration: routine measurements, large trial
-              activity and criteria that translate cleanly into structured checks.
-            </p>
-            <div className="mt-8 grid gap-4 lg:grid-cols-3">
-              <div className="surface p-5">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+              <HeartIntelligence />
+              <div>
+                <p className="text-sm font-semibold uppercase text-hero-accent">Flagship research area</p>
+                <h2 id="heart" className="mt-3 font-display text-3xl font-semibold text-hero-foreground">
+                  Heart Disease Research Intelligence
+                </h2>
+                <p className="mt-4 max-w-3xl text-hero-muted">
+                  Cardiovascular research is the primary demonstration: routine measurements, active
+                  trial discovery and eligibility criteria translated into traceable structured checks.
+                </p>
+                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <div className="glass-dark p-5">
                 <h3 className="text-sm font-semibold">Conditions</h3>
-                <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                <ul className="mt-3 space-y-1.5 text-sm text-hero-muted">
                   {[
                     "Coronary artery disease",
                     "Heart failure",
@@ -255,12 +274,12 @@ function Landing() {
                   ))}
                 </ul>
               </div>
-              <div className="surface p-5">
+              <div className="glass-dark p-5">
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-sm font-semibold">Research variables</h3>
                   <ProvenanceTag kind="synthetic" />
                 </div>
-                <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                <ul className="mt-3 space-y-1.5 text-sm text-hero-muted">
                   {[
                     "Age",
                     "Blood pressure",
@@ -273,30 +292,30 @@ function Landing() {
                   ))}
                 </ul>
               </div>
-              <div className="surface p-5">
+              <div className="glass-dark p-5 sm:col-span-2">
                 <h3 className="text-sm font-semibold">Three-state screening</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <OutcomeBadge outcome="met" />
                   <OutcomeBadge outcome="not_met" />
                   <OutcomeBadge outcome="unknown" />
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-3 text-sm leading-relaxed text-hero-muted">
                   Missing information stays UNKNOWN. It is never silently converted into a pass, and a
                   candidate is only ever described as <em>potentially relevant</em>.
                 </p>
               </div>
+                </div>
+                <Link
+                  to="/diseases/$slug"
+                  params={{ slug: "heart-cardiovascular" }}
+                  className="mt-6 inline-block text-sm font-semibold text-hero-accent hover:underline"
+                >
+                  Open cardiovascular research →
+                </Link>
+              </div>
             </div>
-            <div className="mt-8">
+            <div className="mt-12 text-foreground">
               <TrialSearch initialCondition="heart failure" />
-            </div>
-            <div className="mt-6">
-              <Link
-                to="/diseases/$slug"
-                params={{ slug: "heart-cardiovascular" }}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Open the full cardiovascular research page →
-              </Link>
             </div>
           </div>
         </section>
