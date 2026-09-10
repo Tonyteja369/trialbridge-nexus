@@ -8,7 +8,7 @@ import { ProvenanceTag } from "@/components/DataProvenance";
 import { BiomedicalVideo } from "@/components/BiomedicalVideo";
 import { HeartIntelligence } from "@/components/HeartIntelligence";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_protected/")({
   head: () => ({
     meta: [
       { title: "ClinQSphereX — Clinical Trial Recruitment & Research Operations" },

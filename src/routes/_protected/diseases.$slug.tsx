@@ -7,7 +7,7 @@ import { ProvenanceTag } from "@/components/DataProvenance";
 import { getDisease, diseases } from "@/lib/diseases";
 import { diseaseVisual } from "@/lib/disease-visuals";
 
-export const Route = createFileRoute("/diseases/$slug")({
+export const Route = createFileRoute("/_protected/diseases/$slug")({
   loader: ({ params }) => {
     const disease = getDisease(params.slug);
     if (!disease) throw notFound();

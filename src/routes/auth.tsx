@@ -38,12 +38,39 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [allowVideo, setAllowVideo] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard", replace: true });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    let active = true;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    const constrainedNetwork = Boolean(
+      connection?.saveData || connection?.effectiveType === "slow-2g" || connection?.effectiveType === "2g",
+    );
+    if (reducedMotion || constrainedNetwork) return;
+
+    const batteryNavigator = navigator as Navigator & {
+      getBattery?: () => Promise<{ level: number; charging: boolean }>;
+    };
+    if (!batteryNavigator.getBattery) {
+      setAllowVideo(true);
+      return;
+    }
+    batteryNavigator.getBattery().then((battery) => {
+      if (active) setAllowVideo(battery.charging || battery.level > 0.2);
+    }).catch(() => {
+      if (active) setAllowVideo(true);
+    });
+    return () => { active = false; };
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -89,18 +116,26 @@ function AuthPage() {
 
   return (
     <main className="auth-landscape relative min-h-screen overflow-hidden bg-hero text-hero-foreground">
-      <video
-        className="auth-landscape-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        poster={authPosterAsset.url}
-        aria-label="Abstract biomedical neural network visualization"
-      >
-        <source src={authVideoAsset.url} type="video/mp4" />
-      </video>
+       {allowVideo ? (
+         <video
+           className="auth-landscape-video"
+           autoPlay
+           muted
+           loop
+           playsInline
+           preload="metadata"
+           poster={authPosterAsset.url}
+           aria-label="Abstract biomedical neural network visualization"
+         >
+           <source src={authVideoAsset.url} type="video/mp4" />
+         </video>
+       ) : (
+         <img
+           src={authPosterAsset.url}
+           alt="Abstract biomedical neural network visualization"
+           className="auth-landscape-video"
+         />
+       )}
       <div className="auth-landscape-shade" aria-hidden />
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12">

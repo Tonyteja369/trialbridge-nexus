@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/PublicNav";
 import { SafetyBanner } from "@/components/SafetyBanner";
 
-export const Route = createFileRoute("/platform")({
+export const Route = createFileRoute("/_protected/platform")({
   head: () => ({
     meta: [
       { title: "Platform — ClinQSphereX" },

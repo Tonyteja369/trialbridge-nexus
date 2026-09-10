@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/PublicNav";
 
-export const Route = createFileRoute("/security")({
+export const Route = createFileRoute("/_protected/security")({
   head: () => ({
     meta: [
       { title: "Security — ClinQSphereX" },
