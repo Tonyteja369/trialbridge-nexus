@@ -9,13 +9,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/operations")({
   head: () => ({
     meta: [
-      { title: "Operations & audit — TrialBridge" },
+      { title: "Operations & audit — Diagnosphere.X" },
       {
         name: "description",
         content:
           "Notification queue with retries and dead-letter handling, optimisation runs and the complete research audit trail.",
       },
-      { property: "og:title", content: "Operations & audit — TrialBridge" },
+      { property: "og:title", content: "Operations & audit — Diagnosphere.X" },
       {
         property: "og:description",
         content: "Background queue health, optimisation runs and audit history.",

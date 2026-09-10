@@ -1,5 +1,5 @@
 """
-TrialBridge — QAOA experiment for research-site allocation.
+Diagnosphere.X — QAOA experiment for research-site allocation.
 
 Runs OUTSIDE the deployed web app (the app solves the same QUBO classically).
 This script reproduces the app's model in Qiskit and compares:
