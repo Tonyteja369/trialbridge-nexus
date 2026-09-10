@@ -34,9 +34,9 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-ink px-4 py-6 text-ink-foreground md:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-ink/70 px-4 py-6 text-ink-foreground backdrop-blur-xl md:flex">
         <Link to="/dashboard" className="px-2 font-display text-lg font-semibold">
-          TrialBridge
+          Diagnosphere<span className="text-primary">.X</span>
         </Link>
         <p className="mt-1 px-2 text-xs text-ink-muted">Research operations</p>
         <nav className="mt-8 flex flex-1 flex-col gap-1">

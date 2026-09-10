@@ -79,16 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TrialBridge — Clinical Research Operations" },
+      { title: "Diagnosphere.X — Clinical Research Operations" },
       {
         name: "description",
         content:
-          "Clinical trial recruitment, participant coordination and research operations with explainable screening and human review.",
+          "Clinical trial recruitment, participant coordination and research operations with explainable screening support and researcher review at every step.",
       },
-      { property: "og:title", content: "TrialBridge — Clinical Research Operations" },
+      { property: "og:title", content: "Diagnosphere.X — Clinical Research Operations" },
       {
         property: "og:description",
-        content: "Explainable participant screening, consent tracking and research coordination.",
+        content:
+          "Explainable screening support, consent tracking and research coordination — researchers decide.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -99,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],

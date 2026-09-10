@@ -12,13 +12,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/candidates/$candidateId")({
   head: () => ({
     meta: [
-      { title: "Candidate review — TrialBridge" },
+      { title: "Candidate review — Diagnosphere.X" },
       {
         name: "description",
         content:
           "Criterion-by-criterion explanation of a screening suggestion, with reviewer decision, consent status and visit scheduling.",
       },
-      { property: "og:title", content: "Candidate review — TrialBridge" },
+      { property: "og:title", content: "Candidate review — Diagnosphere.X" },
       { property: "og:description", content: "Explainable screening result awaiting human review." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

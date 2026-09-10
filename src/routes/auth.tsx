@@ -7,13 +7,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — TrialBridge research workspace" },
+      { title: "Sign in — Diagnosphere.X research workspace" },
       {
         name: "description",
         content:
-          "Sign in to the TrialBridge clinical research operations workspace to manage studies, screening and consent.",
+          "Sign in to the Diagnosphere.X clinical research operations workspace to manage studies, screening and consent.",
       },
-      { property: "og:title", content: "Sign in — TrialBridge" },
+      { property: "og:title", content: "Sign in — Diagnosphere.X" },
       {
         property: "og:description",
         content: "Access your clinical research operations workspace.",
@@ -82,10 +82,11 @@ function AuthPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted px-4 py-10">
-      <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-sm">
+    <main className="relative flex min-h-screen items-center justify-center px-4 py-10">
+      <div aria-hidden className="pointer-events-none absolute inset-0 grid-veil" />
+      <div className="surface-strong reveal relative w-full max-w-md p-8">
         <Link to="/" className="font-display text-lg font-semibold">
-          TrialBridge
+          Diagnosphere<span className="text-primary">.X</span>
         </Link>
         <h1 className="mt-6 text-xl font-semibold">
           {mode === "signin" ? "Sign in to your workspace" : "Create a research account"}

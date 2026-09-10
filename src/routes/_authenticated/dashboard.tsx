@@ -7,13 +7,13 @@ import { StatusPill } from "@/components/StatusPill";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Coordinator dashboard — TrialBridge" },
+      { title: "Coordinator dashboard — Diagnosphere.X" },
       {
         name: "description",
         content:
           "Live view of study recruitment pipelines, consent status, open tasks and recent research actions.",
       },
-      { property: "og:title", content: "Coordinator dashboard — TrialBridge" },
+      { property: "og:title", content: "Coordinator dashboard — Diagnosphere.X" },
       { property: "og:description", content: "Recruitment pipeline and research operations overview." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

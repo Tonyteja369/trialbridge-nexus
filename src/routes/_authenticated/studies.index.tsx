@@ -8,12 +8,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/studies/")({
   head: () => ({
     meta: [
-      { title: "Studies — TrialBridge" },
+      { title: "Studies — Diagnosphere.X" },
       {
         name: "description",
         content: "All clinical studies your research organisation is recruiting for, with protocol versions and sites.",
       },
-      { property: "og:title", content: "Studies — TrialBridge" },
+      { property: "og:title", content: "Studies — Diagnosphere.X" },
       { property: "og:description", content: "Manage clinical studies, protocol versions and research sites." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
