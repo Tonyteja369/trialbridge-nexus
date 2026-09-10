@@ -298,6 +298,31 @@ function CandidatePage() {
           </button>
         </div>
       </section>
+
+      <section className="surface p-5">
+        <h2 className="text-base font-semibold">Activity timeline</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Recorded actions for this candidate, newest first.
+        </p>
+        {data.events.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No recorded activity yet.</p>
+        ) : (
+          <ol className="mt-4 space-y-3 border-l border-border pl-4 text-sm">
+            {data.events.map((e: any) => (
+              <li key={e.id} className="relative">
+                <span
+                  className="absolute -left-[1.3rem] top-1.5 size-2 rounded-full bg-primary"
+                  aria-hidden
+                />
+                <p className="font-medium">{String(e.action).replace(/[._]/g, " ")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {e.actor_email ?? "system"} · {new Date(e.created_at).toLocaleString()}
+                </p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </div>
   );
 }
