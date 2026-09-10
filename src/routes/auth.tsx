@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/Wordmark";
-import { BiomedicalVideo } from "@/components/BiomedicalVideo";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, LockKeyhole } from "lucide-react";
+import authVideoAsset from "@/assets/clinqspherex-auth-landscape.mp4.asset.json";
+import authPosterAsset from "@/assets/clinqspherex-auth-landscape-poster.jpg.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -86,32 +88,58 @@ function AuthPage() {
   }
 
   return (
-    <main className="cinematic-band relative flex min-h-screen items-center overflow-hidden px-4 py-10">
-      <div className="absolute inset-0 opacity-55" aria-hidden>
-        <BiomedicalVideo compact />
-      </div>
-      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1fr_28rem]">
-        <div className="hidden max-w-xl lg:block">
-          <p className="text-sm font-semibold uppercase text-hero-accent">Research workspace</p>
-          <h2 className="mt-4 font-display text-4xl font-semibold leading-tight text-hero-foreground">
-            Evidence, explanation and human judgment in one focused environment.
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-hero-muted">
-            Continue to study operations, candidate screening, consent, experiments and audited actions.
-          </p>
-        </div>
-        <GlassPanel variant="dark" className="w-full p-7 sm:p-9">
-        <Link to="/" className="text-hero-foreground">
-          <Wordmark />
-        </Link>
-        <h1 className="mt-8 text-xl font-semibold text-hero-foreground">
-          {mode === "signin" ? "Researcher sign in" : "Create a research account"}
-        </h1>
-        <p className="mt-1 text-sm text-hero-muted">
-          Accounts join the demo research organisation with the coordinator role.
-        </p>
+    <main className="auth-landscape relative min-h-screen overflow-hidden bg-hero text-hero-foreground">
+      <video
+        className="auth-landscape-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster={authPosterAsset.url}
+        aria-label="Abstract biomedical neural network visualization"
+      >
+        <source src={authVideoAsset.url} type="video/mp4" />
+      </video>
+      <div className="auth-landscape-shade" aria-hidden />
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="text-hero-foreground" aria-label="ClinQSphereX home">
+            <Wordmark />
+          </Link>
+          <div className="glass-label normal-case">
+            <LockKeyhole className="size-3.5" aria-hidden />
+            Secure research access
+          </div>
+        </div>
+
+        <div className="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[minmax(0,1fr)_27rem] lg:gap-20">
+          <section className="max-w-2xl self-end pb-2 lg:self-center lg:pb-0">
+            <p className="text-sm font-semibold uppercase text-hero-accent">Clinical intelligence landscape</p>
+            <h2 className="mt-4 max-w-xl font-display text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+              Research decisions begin with trusted access.
+            </h2>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-hero-muted sm:text-lg">
+              Enter the human-controlled workspace for study operations, evidence review and transparent research workflows.
+            </p>
+          </section>
+
+          <GlassPanel variant="dark" className="auth-glass-panel w-full p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-hero-accent">
+              <span className="size-1.5 rounded-full bg-hero-accent" aria-hidden />
+              Researcher portal
+            </div>
+            <h1 className="mt-5 text-2xl font-semibold text-hero-foreground">
+              {mode === "signin" ? "Welcome back" : "Create your account"}
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-hero-muted">
+              {mode === "signin"
+                ? "Sign in to continue to your research workspace."
+                : "Accounts join the demo research organisation with the coordinator role."}
+            </p>
+
+        <form onSubmit={submit} className="mt-7 space-y-4">
           {mode === "signup" && (
             <div>
               <label htmlFor="name" className="text-sm font-medium text-hero-foreground">
@@ -157,7 +185,8 @@ function AuthPage() {
             disabled={busy}
             className="h-10 w-full"
           >
-            {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+            <span>{busy ? "Please wait…" : mode === "signin" ? "Continue to workspace" : "Create account"}</span>
+            {!busy && <ArrowRight className="size-4" aria-hidden />}
           </Button>
         </form>
 
@@ -178,7 +207,11 @@ function AuthPage() {
             ? "No account yet? Create one"
             : "Already have an account? Sign in"}
         </Button>
-        </GlassPanel>
+            <p className="mt-5 text-center text-xs leading-relaxed text-hero-muted">
+              Screening support only. Researchers remain responsible for all decisions.
+            </p>
+          </GlassPanel>
+        </div>
       </div>
     </main>
   );

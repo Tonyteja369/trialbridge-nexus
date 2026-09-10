@@ -16,6 +16,7 @@
 - [x] Footer creator credits and updated public navigation
 - [x] Desktop/mobile, interaction, accessibility, console, and route verification
 - [x] Reusable liquid-glass tokens and components for navigation, cards, dialogs, popovers, and evidence panels
+- [x] Uploaded neural-network video used as the full-screen authentication landscape with minimal black shading and responsive liquid-glass form
 
 ## Now — rebrand + design system (this turn)
 - [x] Rename ClinQSphereX → ClinQSphereX everywhere (nav, titles, metadata, copy)
