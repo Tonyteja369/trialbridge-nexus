@@ -94,45 +94,15 @@ function QuantumLab() {
         </p>
       </section>
 
-      <section aria-labelledby="comparison" className="surface p-5">
+      <section aria-labelledby="comparison">
         <h2 id="comparison" className="text-base font-semibold">
           Classical baseline vs quantum kernel
         </h2>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[32rem] text-sm">
-            <caption className="sr-only">
-              Evaluation metrics for the classical baseline and quantum kernel models
-            </caption>
-            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th scope="col" className="px-4 py-2.5">Metric</th>
-                <th scope="col" className="px-4 py-2.5">Classical baseline</th>
-                <th scope="col" className="px-4 py-2.5">Quantum kernel</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {metrics.map((m) => (
-                <tr key={m}>
-                  <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                    {m}
-                  </th>
-                  <td className="px-4 py-2.5 text-muted-foreground">Not evaluated</td>
-                  <td className="px-4 py-2.5 text-muted-foreground">Not evaluated</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-4">
+          <HeartBenchmark />
         </div>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          No benchmark run has been recorded in this workspace yet, so every cell reads &ldquo;Not
-          evaluated&rdquo;. Values appear here only when a real evaluation has been executed and
-          stored.
-        </p>
-        <p className="mt-3 rounded-md border border-border bg-secondary p-3 text-sm">
-          Quantum performance is experimentally evaluated against classical baselines. ClinQSphereX
-          does not assume quantum advantage.
-        </p>
       </section>
+
 
 
       <section aria-labelledby="genomic-benchmark">
