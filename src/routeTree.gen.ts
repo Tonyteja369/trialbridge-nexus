@@ -13,22 +13,22 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGenomicsRouteImport } from './routes/_authenticated/genomics'
 import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedParticipantsRouteImport } from './routes/_authenticated/participants'
 import { Route as AuthenticatedQuantumLabRouteImport } from './routes/_authenticated/quantum-lab'
+import { Route as AuthenticatedResearchRouteImport } from './routes/_authenticated/research'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAboutRouteImport } from './routes/_protected/about'
-import { Route as ProtectedGenomicsRouteImport } from './routes/_protected/genomics'
 import { Route as ProtectedPlatformRouteImport } from './routes/_protected/platform'
-import { Route as ProtectedResearchRouteImport } from './routes/_protected/research'
 import { Route as ProtectedSecurityRouteImport } from './routes/_protected/security'
 import { Route as AuthenticatedCandidatesCandidateIdRouteImport } from './routes/_authenticated/candidates.$candidateId'
+import { Route as AuthenticatedDiseasesIndexRouteImport } from './routes/_authenticated/diseases.index'
+import { Route as AuthenticatedDiseasesSlugRouteImport } from './routes/_authenticated/diseases.$slug'
 import { Route as AuthenticatedStudiesIndexRouteImport } from './routes/_authenticated/studies.index'
 import { Route as AuthenticatedStudiesStudyIdRouteImport } from './routes/_authenticated/studies.$studyId'
-import { Route as ProtectedDiseasesIndexRouteImport } from './routes/_protected/diseases.index'
-import { Route as ProtectedDiseasesSlugRouteImport } from './routes/_protected/diseases.$slug'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -46,6 +46,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGenomicsRoute = AuthenticatedGenomicsRouteImport.update({
+  id: '/genomics',
+  path: '/genomics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
@@ -69,6 +74,11 @@ const AuthenticatedQuantumLabRoute = AuthenticatedQuantumLabRouteImport.update({
   path: '/quantum-lab',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedResearchRoute = AuthenticatedResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -84,19 +94,9 @@ const ProtectedAboutRoute = ProtectedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-const ProtectedGenomicsRoute = ProtectedGenomicsRouteImport.update({
-  id: '/genomics',
-  path: '/genomics',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
 const ProtectedPlatformRoute = ProtectedPlatformRouteImport.update({
   id: '/platform',
   path: '/platform',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedResearchRoute = ProtectedResearchRouteImport.update({
-  id: '/research',
-  path: '/research',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 const ProtectedSecurityRoute = ProtectedSecurityRouteImport.update({
@@ -108,6 +108,18 @@ const AuthenticatedCandidatesCandidateIdRoute =
   AuthenticatedCandidatesCandidateIdRouteImport.update({
     id: '/candidates/$candidateId',
     path: '/candidates/$candidateId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDiseasesIndexRoute =
+  AuthenticatedDiseasesIndexRouteImport.update({
+    id: '/diseases/',
+    path: '/diseases/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDiseasesSlugRoute =
+  AuthenticatedDiseasesSlugRouteImport.update({
+    id: '/diseases/$slug',
+    path: '/diseases/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedStudiesIndexRoute =
@@ -122,56 +134,46 @@ const AuthenticatedStudiesStudyIdRoute =
     path: '/studies/$studyId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ProtectedDiseasesIndexRoute = ProtectedDiseasesIndexRouteImport.update({
-  id: '/diseases/',
-  path: '/diseases/',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedDiseasesSlugRoute = ProtectedDiseasesSlugRouteImport.update({
-  id: '/diseases/$slug',
-  path: '/diseases/$slug',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/genomics': typeof AuthenticatedGenomicsRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
   '/quantum-lab': typeof AuthenticatedQuantumLabRoute
+  '/research': typeof AuthenticatedResearchRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/about': typeof ProtectedAboutRoute
-  '/genomics': typeof ProtectedGenomicsRoute
   '/platform': typeof ProtectedPlatformRoute
-  '/research': typeof ProtectedResearchRoute
   '/security': typeof ProtectedSecurityRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
+  '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
-  '/diseases/$slug': typeof ProtectedDiseasesSlugRoute
+  '/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/studies/': typeof AuthenticatedStudiesIndexRoute
-  '/diseases/': typeof ProtectedDiseasesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof ProtectedIndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/genomics': typeof AuthenticatedGenomicsRoute
   '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
   '/quantum-lab': typeof AuthenticatedQuantumLabRoute
+  '/research': typeof AuthenticatedResearchRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/about': typeof ProtectedAboutRoute
-  '/genomics': typeof ProtectedGenomicsRoute
   '/platform': typeof ProtectedPlatformRoute
-  '/research': typeof ProtectedResearchRoute
   '/security': typeof ProtectedSecurityRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
+  '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
-  '/diseases/$slug': typeof ProtectedDiseasesSlugRoute
+  '/diseases': typeof AuthenticatedDiseasesIndexRoute
   '/studies': typeof AuthenticatedStudiesIndexRoute
-  '/diseases': typeof ProtectedDiseasesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,22 +181,22 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/genomics': typeof AuthenticatedGenomicsRoute
   '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/participants': typeof AuthenticatedParticipantsRoute
   '/_authenticated/quantum-lab': typeof AuthenticatedQuantumLabRoute
+  '/_authenticated/research': typeof AuthenticatedResearchRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_protected/about': typeof ProtectedAboutRoute
-  '/_protected/genomics': typeof ProtectedGenomicsRoute
   '/_protected/platform': typeof ProtectedPlatformRoute
-  '/_protected/research': typeof ProtectedResearchRoute
   '/_protected/security': typeof ProtectedSecurityRoute
   '/_protected/': typeof ProtectedIndexRoute
   '/_authenticated/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
+  '/_authenticated/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/_authenticated/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
-  '/_protected/diseases/$slug': typeof ProtectedDiseasesSlugRoute
+  '/_authenticated/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/_authenticated/studies/': typeof AuthenticatedStudiesIndexRoute
-  '/_protected/diseases/': typeof ProtectedDiseasesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -202,63 +204,63 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/genomics'
     | '/governance'
     | '/operations'
     | '/participants'
     | '/quantum-lab'
+    | '/research'
     | '/tasks'
     | '/about'
-    | '/genomics'
     | '/platform'
-    | '/research'
     | '/security'
     | '/candidates/$candidateId'
-    | '/studies/$studyId'
     | '/diseases/$slug'
-    | '/studies/'
+    | '/studies/$studyId'
     | '/diseases/'
+    | '/studies/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/genomics'
     | '/governance'
     | '/operations'
     | '/participants'
     | '/quantum-lab'
+    | '/research'
     | '/tasks'
     | '/about'
-    | '/genomics'
     | '/platform'
-    | '/research'
     | '/security'
     | '/candidates/$candidateId'
-    | '/studies/$studyId'
     | '/diseases/$slug'
-    | '/studies'
+    | '/studies/$studyId'
     | '/diseases'
+    | '/studies'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_protected'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/genomics'
     | '/_authenticated/governance'
     | '/_authenticated/operations'
     | '/_authenticated/participants'
     | '/_authenticated/quantum-lab'
+    | '/_authenticated/research'
     | '/_authenticated/tasks'
     | '/_protected/about'
-    | '/_protected/genomics'
     | '/_protected/platform'
-    | '/_protected/research'
     | '/_protected/security'
     | '/_protected/'
     | '/_authenticated/candidates/$candidateId'
+    | '/_authenticated/diseases/$slug'
     | '/_authenticated/studies/$studyId'
-    | '/_protected/diseases/$slug'
+    | '/_authenticated/diseases/'
     | '/_authenticated/studies/'
-    | '/_protected/diseases/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/genomics': {
+      id: '/_authenticated/genomics'
+      path: '/genomics'
+      fullPath: '/genomics'
+      preLoaderRoute: typeof AuthenticatedGenomicsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/governance': {
       id: '/_authenticated/governance'
       path: '/governance'
@@ -325,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuantumLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/research': {
+      id: '/_authenticated/research'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof AuthenticatedResearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks': {
       id: '/_authenticated/tasks'
       path: '/tasks'
@@ -346,25 +362,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAboutRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/genomics': {
-      id: '/_protected/genomics'
-      path: '/genomics'
-      fullPath: '/genomics'
-      preLoaderRoute: typeof ProtectedGenomicsRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
     '/_protected/platform': {
       id: '/_protected/platform'
       path: '/platform'
       fullPath: '/platform'
       preLoaderRoute: typeof ProtectedPlatformRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/research': {
-      id: '/_protected/research'
-      path: '/research'
-      fullPath: '/research'
-      preLoaderRoute: typeof ProtectedResearchRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
     '/_protected/security': {
@@ -381,6 +383,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCandidatesCandidateIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/diseases/': {
+      id: '/_authenticated/diseases/'
+      path: '/diseases'
+      fullPath: '/diseases/'
+      preLoaderRoute: typeof AuthenticatedDiseasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diseases/$slug': {
+      id: '/_authenticated/diseases/$slug'
+      path: '/diseases/$slug'
+      fullPath: '/diseases/$slug'
+      preLoaderRoute: typeof AuthenticatedDiseasesSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/studies/': {
       id: '/_authenticated/studies/'
       path: '/studies'
@@ -395,45 +411,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudiesStudyIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_protected/diseases/': {
-      id: '/_protected/diseases/'
-      path: '/diseases'
-      fullPath: '/diseases/'
-      preLoaderRoute: typeof ProtectedDiseasesIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/diseases/$slug': {
-      id: '/_protected/diseases/$slug'
-      path: '/diseases/$slug'
-      fullPath: '/diseases/$slug'
-      preLoaderRoute: typeof ProtectedDiseasesSlugRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGenomicsRoute: typeof AuthenticatedGenomicsRoute
   AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedParticipantsRoute: typeof AuthenticatedParticipantsRoute
   AuthenticatedQuantumLabRoute: typeof AuthenticatedQuantumLabRoute
+  AuthenticatedResearchRoute: typeof AuthenticatedResearchRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedCandidatesCandidateIdRoute: typeof AuthenticatedCandidatesCandidateIdRoute
+  AuthenticatedDiseasesSlugRoute: typeof AuthenticatedDiseasesSlugRoute
   AuthenticatedStudiesStudyIdRoute: typeof AuthenticatedStudiesStudyIdRoute
+  AuthenticatedDiseasesIndexRoute: typeof AuthenticatedDiseasesIndexRoute
   AuthenticatedStudiesIndexRoute: typeof AuthenticatedStudiesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGenomicsRoute: AuthenticatedGenomicsRoute,
   AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedParticipantsRoute: AuthenticatedParticipantsRoute,
   AuthenticatedQuantumLabRoute: AuthenticatedQuantumLabRoute,
+  AuthenticatedResearchRoute: AuthenticatedResearchRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedCandidatesCandidateIdRoute:
     AuthenticatedCandidatesCandidateIdRoute,
+  AuthenticatedDiseasesSlugRoute: AuthenticatedDiseasesSlugRoute,
   AuthenticatedStudiesStudyIdRoute: AuthenticatedStudiesStudyIdRoute,
+  AuthenticatedDiseasesIndexRoute: AuthenticatedDiseasesIndexRoute,
   AuthenticatedStudiesIndexRoute: AuthenticatedStudiesIndexRoute,
 }
 
@@ -442,24 +452,16 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface ProtectedRouteRouteChildren {
   ProtectedAboutRoute: typeof ProtectedAboutRoute
-  ProtectedGenomicsRoute: typeof ProtectedGenomicsRoute
   ProtectedPlatformRoute: typeof ProtectedPlatformRoute
-  ProtectedResearchRoute: typeof ProtectedResearchRoute
   ProtectedSecurityRoute: typeof ProtectedSecurityRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
-  ProtectedDiseasesSlugRoute: typeof ProtectedDiseasesSlugRoute
-  ProtectedDiseasesIndexRoute: typeof ProtectedDiseasesIndexRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedAboutRoute: ProtectedAboutRoute,
-  ProtectedGenomicsRoute: ProtectedGenomicsRoute,
   ProtectedPlatformRoute: ProtectedPlatformRoute,
-  ProtectedResearchRoute: ProtectedResearchRoute,
   ProtectedSecurityRoute: ProtectedSecurityRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,
-  ProtectedDiseasesSlugRoute: ProtectedDiseasesSlugRoute,
-  ProtectedDiseasesIndexRoute: ProtectedDiseasesIndexRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

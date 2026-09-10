@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, Activity, Database, Dna, Gauge, Timer, Download } from "lucide-react";
-import { PublicNav, PublicFooter } from "@/components/PublicNav";
 import { BiomedicalVideo } from "@/components/BiomedicalVideo";
 import { TrialSearch } from "@/components/TrialSearch";
 import { EvidencePanel } from "@/components/EvidencePanel";
@@ -19,7 +18,7 @@ import {
   type IngestRun,
 } from "@/lib/research-sources.functions";
 
-export const Route = createFileRoute("/_protected/genomics")({
+export const Route = createFileRoute("/_authenticated/genomics")({
   head: () => ({
     meta: [
       { title: "Genomic Intelligence Engine — ClinQSphereX" },
@@ -142,7 +141,6 @@ function GenomicsPage() {
 
   return (
     <div className="min-h-dvh">
-      <PublicNav />
 
       <main>
         <section className="relative overflow-hidden">
@@ -589,7 +587,6 @@ function GenomicsPage() {
         </div>
       </main>
 
-      <PublicFooter />
     </div>
   );
 }
