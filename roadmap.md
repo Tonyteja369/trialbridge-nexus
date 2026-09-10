@@ -7,7 +7,7 @@
 - [x] Immersive glass authentication and research workspace styling
 - [ ] Scientific visualization upgrades for candidate review and Quantum Lab
 - [x] Footer creator credits and updated public navigation
-- [ ] Desktop/mobile, interaction, accessibility, console, and route verification
+- [x] Desktop/mobile, interaction, accessibility, console, and route verification
 
 ## Now — rebrand + design system (this turn)
 - [x] Rename ClinQSphereX → ClinQSphereX everywhere (nav, titles, metadata, copy)
