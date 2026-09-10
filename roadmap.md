@@ -1,12 +1,12 @@
 # Diagnosphere.X roadmap
 
 ## Now — rebrand + design system (this turn)
-- [ ] Rename TrialBridge → Diagnosphere.X everywhere (nav, titles, metadata, copy)
-- [ ] Arctic Signal palette as semantic tokens (#0DB8D3 #1B7FDC #065B98 #193546)
-- [ ] Sora headings + Manrope body
-- [ ] Glass surfaces, depth, restrained motion
-- [ ] Procedural WebGL diagnostic sphere hero (R3F/Drei/Three) with static + reduced-motion fallback
-- [ ] Language rules: "potentially eligible", "researcher review required", "model prediction", no compliance claims
+- [x] Rename TrialBridge → Diagnosphere.X everywhere (nav, titles, metadata, copy)
+- [x] Arctic Signal palette as semantic tokens (#0DB8D3 #1B7FDC #065B98 #193546)
+- [x] Sora headings + Manrope body
+- [x] Glass surfaces, depth, restrained motion
+- [x] Procedural WebGL diagnostic sphere hero (R3F/Drei/Three) with static + reduced-motion fallback
+- [x] Language rules: "potentially eligible", "researcher review required", "model prediction", no compliance claims
 
 ## Next — screening + evidence honesty
 - [ ] Three-state criterion display: MATCH / NOT MATCHED / UNKNOWN (never coerce UNKNOWN)
