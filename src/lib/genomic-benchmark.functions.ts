@@ -183,9 +183,11 @@ export const loadGenomicFeatureSet = createServerFn({ method: "GET" })
       const snps: any[] = snpJson?._embedded?.singleNucleotidePolymorphisms ?? [];
 
       const gwasFeatures: GenomicFeature[] = [];
+      const seen = new Set<string>();
       for (const snp of snps.slice(0, 6)) {
         const rsId: string = snp?.rsId;
-        if (!rsId) continue;
+        if (!rsId || seen.has(rsId)) continue;
+        seen.add(rsId);
         const loc = snp?.locations?.[0];
         let pvalue: number | null = null;
         let trait = "";
