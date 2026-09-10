@@ -45,6 +45,11 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted: var(--hero-muted);
+  --color-hero-accent: var(--hero-accent);
+  --color-warm-signal: var(--warm-signal);
 }
 
 /*
@@ -97,6 +102,16 @@
   --chart-3: var(--violet-800);
   --chart-4: oklch(0.75 0.09 296);
   --chart-5: oklch(0.86 0.05 296);
+  --hero: oklch(0.12 0.025 300);
+  --hero-foreground: oklch(0.985 0.008 300);
+  --hero-muted: oklch(0.78 0.025 300);
+  --hero-accent: oklch(0.76 0.16 303);
+  --warm-signal: oklch(0.74 0.13 65);
+  --glass: oklch(0.99 0.008 300 / 72%);
+  --glass-dark: oklch(0.18 0.035 300 / 66%);
+  --glass-border: oklch(1 0 0 / 20%);
+  --glass-highlight: oklch(1 0 0 / 36%);
+  --shadow-glass: 0 24px 80px -36px oklch(0.18 0.08 300 / 52%);
 }
 
 .dark {
@@ -139,7 +154,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: 0;
   }
 
   :focus-visible {
@@ -167,16 +182,18 @@
 
 /* Plain, bordered panel used across the product. */
 @utility surface {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--glass) 88%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--border) 74%, white);
   border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px) saturate(118%);
 }
 
 @utility surface-strong {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--glass) 84%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--border) 64%, white);
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 2px oklch(0.3 0.03 300 / 6%), 0 8px 24px -18px oklch(0.3 0.03 300 / 30%);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-highlight);
+  backdrop-filter: blur(22px) saturate(124%);
 }
 
 @utility surface-soft {
@@ -192,7 +209,8 @@
 
   &:hover {
     border-color: color-mix(in oklab, var(--violet-400) 55%, transparent);
-    box-shadow: 0 1px 2px oklch(0.3 0.03 300 / 6%);
+    box-shadow: 0 18px 44px -32px oklch(0.3 0.14 300 / 42%);
+    transform: translateY(-2px);
   }
 }
 
@@ -217,4 +235,233 @@
   to {
     opacity: 1;
   }
+}
+
+@utility cinematic-band {
+  background:
+    linear-gradient(110deg, color-mix(in oklab, var(--hero) 96%, transparent) 10%, color-mix(in oklab, var(--hero) 78%, transparent) 54%, color-mix(in oklab, var(--violet-900) 60%, transparent)),
+    var(--hero);
+  color: var(--hero-foreground);
+}
+
+@utility glass-dark {
+  background: var(--glass-dark);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-highlight);
+  backdrop-filter: blur(22px) saturate(126%);
+}
+
+@utility glass-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--hero) 62%, transparent);
+  padding: 0.42rem 0.7rem;
+  color: var(--hero-foreground);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  backdrop-filter: blur(14px);
+}
+
+@utility section-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding: 5rem 1.25rem;
+}
+
+.hero-environment {
+  position: relative;
+  min-height: min(52rem, calc(100svh - 1rem));
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--hero);
+}
+
+.hero-environment::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, var(--hero) 0%, oklch(0.13 0.03 300 / 92%) 38%, oklch(0.15 0.06 300 / 42%) 68%, oklch(0.12 0.02 300 / 72%) 100%);
+}
+
+.hero-background-video {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.68;
+  filter: saturate(0.72) sepia(0.08) hue-rotate(232deg) contrast(1.08);
+}
+
+.hero-glass-panel {
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, oklch(0.23 0.06 300 / 65%), oklch(0.13 0.025 300 / 38%));
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-highlight);
+  backdrop-filter: blur(22px) saturate(125%);
+}
+
+.biomedical-video {
+  position: relative;
+  min-height: 31rem;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  background: var(--hero);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-highlight);
+}
+
+.biomedical-video-compact { min-height: 16rem; }
+
+.biomedical-video-tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(155deg, oklch(0.2 0.08 300 / 30%), transparent 54%, oklch(0.16 0.04 300 / 72%));
+  box-shadow: inset 0 0 80px oklch(0.12 0.03 300 / 72%);
+}
+
+.heart-stage {
+  position: relative;
+  min-height: 38rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: var(--hero);
+  box-shadow: var(--shadow-glass);
+}
+
+.heart-visual {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: heart-breathe 7s ease-in-out infinite;
+}
+
+.heart-stage-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, oklch(0.12 0.03 300 / 16%), transparent 45%, oklch(0.12 0.03 300 / 72%));
+}
+
+.heart-orbit {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 72%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 1px solid oklch(0.76 0.16 303 / 24%);
+  border-radius: 50%;
+  animation: orbit-turn 18s linear infinite;
+}
+
+.heart-orbit::after {
+  content: "";
+  position: absolute;
+  top: 12%;
+  left: 8%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--hero-accent);
+  box-shadow: 0 0 18px var(--hero-accent);
+}
+
+.heart-signal-grid {
+  position: absolute;
+  inset: auto 1.25rem 1.25rem;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.heart-signal {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.45rem;
+  background: var(--glass-dark);
+  padding: 0.65rem 0.75rem;
+  backdrop-filter: blur(16px);
+}
+
+.research-map {
+  position: relative;
+  min-height: 22rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: radial-gradient(circle at center, var(--violet-100), var(--background) 68%);
+  border: 1px solid var(--border);
+}
+
+.research-map-ring {
+  position: absolute;
+  inset: 15%;
+  border: 1px solid color-mix(in oklab, var(--primary) 32%, transparent);
+  border-radius: 50%;
+}
+
+.research-map-core, .research-map-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
+  border-radius: 999px;
+  background: var(--glass);
+  padding: 0.65rem 0.8rem;
+  box-shadow: var(--shadow-glass);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(14px);
+}
+
+.research-map-core {
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+@keyframes heart-breathe {
+  50% { transform: scale(1.025); filter: brightness(1.06); }
+}
+
+@keyframes orbit-turn { to { rotate: 360deg; } }
+
+.safety-glass {
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, var(--border));
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--glass) 88%, var(--secondary));
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+  backdrop-filter: blur(16px);
+}
+
+@media (max-width: 640px) {
+  .hero-environment { min-height: auto; }
+  .biomedical-video { min-height: 22rem; }
+  .heart-stage { min-height: 32rem; }
+  .heart-signal-grid { grid-template-columns: 1fr; }
+  .heart-signal:nth-child(n + 3) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-visual, .heart-orbit { animation: none; }
+  .hero-background-video { display: none; }
+  .hero-environment { background: linear-gradient(135deg, var(--hero), var(--violet-900)); }
 }
