@@ -3,17 +3,18 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
+import { Wordmark } from "@/components/Wordmark";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Diagnosphere.X research workspace" },
+      { title: "Researcher sign in — ClinQSphereX" },
       {
         name: "description",
         content:
-          "Sign in to the Diagnosphere.X clinical research operations workspace to manage studies, screening and consent.",
+          "Sign in to the ClinQSphereX clinical research operations workspace to manage studies, screening, consent and coordination.",
       },
-      { property: "og:title", content: "Sign in — Diagnosphere.X" },
+      { property: "og:title", content: "Researcher sign in — ClinQSphereX" },
       {
         property: "og:description",
         content: "Access your clinical research operations workspace.",
@@ -82,14 +83,13 @@ function AuthPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center px-4 py-10">
-      <div aria-hidden className="pointer-events-none absolute inset-0 grid-veil" />
-      <div className="surface-strong reveal relative w-full max-w-md p-8">
-        <Link to="/" className="font-display text-lg font-semibold">
-          Diagnosphere<span className="text-primary">.X</span>
+    <main className="flex min-h-screen items-center justify-center bg-secondary/40 px-4 py-10">
+      <div className="surface-strong w-full max-w-md p-8">
+        <Link to="/">
+          <Wordmark />
         </Link>
         <h1 className="mt-6 text-xl font-semibold">
-          {mode === "signin" ? "Sign in to your workspace" : "Create a research account"}
+          {mode === "signin" ? "Researcher sign in" : "Create a research account"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Accounts join the demo research organisation with the coordinator role.

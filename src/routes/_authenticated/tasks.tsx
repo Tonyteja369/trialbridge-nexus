@@ -8,13 +8,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
     meta: [
-      { title: "Tasks & visits — Diagnosphere.X" },
+      { title: "Tasks & visits — ClinQSphereX" },
       {
         name: "description",
         content:
           "Coordinator task list and upcoming study visits across every recruiting study in the organisation.",
       },
-      { property: "og:title", content: "Tasks & visits — Diagnosphere.X" },
+      { property: "og:title", content: "Tasks & visits — ClinQSphereX" },
       { property: "og:description", content: "Coordinator workload and study visit schedule." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

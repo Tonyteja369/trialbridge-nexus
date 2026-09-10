@@ -1,4 +1,4 @@
-# Diagnosphere.X Nexus
+# ClinQSphereX Nexus
 
 UNIVERSAL 24-HOUR HEALTHCARE HACKATHON
 
@@ -201,13 +201,13 @@ ability to justify those decisions are part of the challenge.
 You are assisting a 2-person team participating in a 24-hour healthcare hackathon.
 
 The organizers will reveal the healthcare domain/problem statement at the beginning of the event.
-Diagnosphere.X
+ClinQSphereX
 
 Clinical Trial Recruitment, Participant & Research Operations Platform - Healthcare
 
 Innovation - 24-Hour Swarnandhra College Hackathon 2026
 
-Problem Statement 5 --- Diagnosphere.X
+Problem Statement 5 --- ClinQSphereX
 Clinical Trial Recruitment, Participant & Research Operations Platform
 Problem
 
