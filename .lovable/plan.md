@@ -9,6 +9,8 @@ Make live genomic research retrieval resilient and transparent, allow users to e
 - Return explicit source availability metadata and ensure failed sources render only a clear `SOURCE OFFLINE` state, never retained results from an earlier request.
 - Add JSON and CSV export controls for the current NCBI run, including query, requested/retrieved/processed counts, bases, bytes, all measured timings, throughput, record IDs, and retrieval/export timestamps.
 - Keep export controls unavailable until a successful live run exists.
+- Make sign-in the only public page. Move the home, Genomics, disease, research, platform, security, about, and workspace pages behind one authentication gate while preserving their existing URLs and visual layouts.
+- Keep the dashboard shell limited to operational workspace pages rather than wrapping the cinematic research pages.
 - Use the uploaded poster as the sign-in fallback and stop video loading/playback when reduced-motion, data-saver, slow-network, or low-battery signals indicate constrained playback.
 
 ## Technical details
@@ -16,4 +18,4 @@ Make live genomic research retrieval resilient and transparent, allow users to e
 - Use isolated server-side cache entries keyed by source and normalized query. Cache only successful validated responses and never return expired data as a fallback.
 - Configure client queries to avoid automatic duplicate retries and suppress cached result rendering whenever the latest source request errors.
 - Generate downloads entirely from the successful in-memory run shown on screen; no fabricated fields or hidden data will be added.
-- Verify success, forced-failure behavior, both export formats, reduced-motion fallback, desktop/mobile layout, and browser console output.
+- Verify unauthenticated redirects across representative pages, successful signed-in navigation, success and forced-failure data behavior, both export formats, reduced-motion fallback, desktop/mobile layout, and browser console output.
