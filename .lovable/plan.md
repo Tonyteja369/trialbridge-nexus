@@ -1,24 +1,28 @@
-# Diagnosphere.X immersive redesign
+# ClinQSphereX premium biomedical liquid interface
 
 ## Goal
-Rename TrialBridge to **Diagnosphere.X** and redesign the existing product around the selected Arctic Signal palette, Sora/Manrope typography, glass surfaces, and a full-width Three.js opening scene.
+Transform the existing ClinQSphereX website into an original, immersive violet-and-white biomedical interface while preserving every live workflow, data source, safety statement, and human-review control.
 
 ## What will change
-- Replace visible TrialBridge naming and page metadata with Diagnosphere.X while preserving the existing clinical workflow and safety language.
-- Build a performant interactive Three.js diagnostic sphere for the public opening, inspired by the uploaded dotted-globe reference without embedding the reference image.
-- Recompose the public page into full-width sections with crisp hierarchy, medical-research content, subtle grid texture, glass information panels, and restrained scroll/hover transitions.
-- Carry the same visual system into sign-in and the authenticated workspace: navigation, key summaries, forms, tables, status indicators, and empty/loading states.
-- Keep all existing studies, screening, consent, allocation, task, audit, and account behavior intact.
+- Rebuild the public opening as a cinematic full-width research environment with a slow procedural 3D DNA helix, restrained particles, readable content overlays, and clear Platform/Research actions.
+- Introduce a selective liquid-glass system for navigation, key research panels, authentication, visualization controls, and floating data labels—not every section.
+- Recompose the disease-first homepage into the requested research narrative, keeping heart and cardiovascular research as the flagship example.
+- Add a premium biomedical media display using a locally bundled generated visual/poster rather than unrelated stock footage; motion will come from layered WebGL and interface animation without blocking page load.
+- Build an original cardiovascular research centerpiece with a scientifically inspired, non-graphic heart visualization and surrounding evidence/review panels.
+- Carry the visual system into sign-in, the authenticated workspace, candidate review, and Quantum Lab without changing their data or actions.
+- Update public navigation and footer, including the requested creator credits and research-prototype disclosure.
 
-## Visual system
-- Palette: `#0DB8D3`, `#1B7FDC`, `#065B98`, `#193546`, translated into semantic light/dark tokens with accessible foregrounds.
-- Type: Sora for headings and Manrope for interface/body copy.
-- Surfaces: translucent glass with fine borders and controlled blur; no decorative card nesting.
-- Motion: slow sphere rotation and pointer response, soft section reveals, precise control feedback, and reduced-motion support.
+## Scientific and UX safeguards
+- Keep live ClinicalTrials.gov results, real stored workspace data, and synthetic examples visibly distinguished.
+- Show unavailable model/benchmark values as “Not evaluated” or “Not available”; never invent performance or quantum advantage.
+- Preserve PASS / NOT MATCHED / UNKNOWN semantics and make researcher responsibility visually prominent.
+- Keep external research scale statements qualitative unless the page has a verified source, date, data type, and access status.
+- Maintain keyboard focus, contrast, readable type, semantic headings, loading/error/empty states, and screen-reader labels.
 
 ## Technical details
-- Add React Three Fiber, Drei, Three.js, and Three.js types for the client-rendered scene.
-- Isolate WebGL from server rendering and provide a stable visual fallback.
-- Build the sphere procedurally from instanced points for low draw-call cost and cap rendering resolution for mobile performance.
-- Use semantic design tokens in the global stylesheet rather than hardcoded component colors.
-- Verify the public page, sign-in page, and authenticated dashboard at desktop and mobile sizes; check rendering, interaction, console output, and production compilation.
+- Use React Three Fiber/Three.js for an optimized procedural DNA scene with capped pixel ratio, deterministic geometry, low draw calls, device-aware particle counts, and reduced-motion behavior.
+- Keep WebGL client-safe with a stable CSS/image fallback so unsupported devices still receive a complete page.
+- Use semantic violet/white tokens in the global stylesheet and physically restrained translucency, blur, inner highlights, and shadows.
+- Use CSS intersection-based reveals and limited pointer parallax; avoid heavy post-processing, cursor trails, and excessive animation.
+- Keep the current TanStack Start and Lovable Cloud architecture unchanged.
+- Verify public, auth, dashboard, candidate, and Quantum Lab pages at desktop and mobile sizes, including WebGL visibility, navigation, interactions, console output, and production compilation.

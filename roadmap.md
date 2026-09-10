@@ -1,5 +1,14 @@
 # ClinQSphereX roadmap
 
+## Now — premium biomedical liquid interface
+- [ ] Cinematic violet/white landing experience with strategic liquid-glass surfaces
+- [ ] Optimized 3D DNA environment with reduced-motion and static fallbacks
+- [ ] Premium biomedical media display and cardiovascular research centerpiece
+- [ ] Immersive glass authentication and research workspace styling
+- [ ] Scientific visualization upgrades for candidate review and Quantum Lab
+- [ ] Footer creator credits and updated public navigation
+- [ ] Desktop/mobile, interaction, accessibility, console, and route verification
+
 ## Now — rebrand + design system (this turn)
 - [x] Rename ClinQSphereX → ClinQSphereX everywhere (nav, titles, metadata, copy)
 - [x] Arctic Signal palette as semantic tokens (#0DB8D3 #1B7FDC #065B98 #193546)
