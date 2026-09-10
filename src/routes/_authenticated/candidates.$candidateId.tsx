@@ -41,11 +41,6 @@ const decisions = [
   { status: "withdrawn", label: "Withdraw" },
 ];
 
-function OutcomeIcon({ outcome }: { outcome: string }) {
-  if (outcome === "met") return <Check className="size-4 text-success" aria-label="met" />;
-  if (outcome === "not_met") return <X className="size-4 text-destructive" aria-label="not met" />;
-  return <HelpCircle className="size-4 text-muted-foreground" aria-label="unknown" />;
-}
 
 function CandidatePage() {
   const { candidateId } = Route.useParams();
