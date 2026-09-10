@@ -3,6 +3,7 @@
 ## Now — premium biomedical liquid interface
 - [ ] Cinematic violet/white landing experience with strategic liquid-glass surfaces
 - [ ] Optimized 3D DNA environment with reduced-motion and static fallbacks
+- [ ] Uploaded video used as the cinematic background with matching violet glass color treatment
 - [ ] Premium biomedical media display and cardiovascular research centerpiece
 - [ ] Immersive glass authentication and research workspace styling
 - [ ] Scientific visualization upgrades for candidate review and Quantum Lab
