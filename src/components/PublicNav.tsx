@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
 
 const links = [
+  { to: "/diseases", label: "Diseases" },
   { to: "/platform", label: "Platform" },
   { to: "/research", label: "Research" },
   { to: "/security", label: "Security" },
