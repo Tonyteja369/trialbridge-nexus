@@ -1,5 +1,12 @@
 # ClinQSphereX roadmap
 
+## Done — real public research sources
+- [x] Genomic Intelligence Engine at /genomics: live NCBI E-utilities, PubMed, UniProt, ClinicalTrials.gov
+- [x] Live source-status panel (LIVE / SOURCE OFFLINE / CONTROLLED ACCESS), no silent fallback
+- [x] Measured ingest run: records, bases, bytes, search/download/parse/process timings, throughput
+- [x] Real sequence excerpts with accession, source link and retrieval timestamp
+- [x] Source scale vs current run kept visually separate; projections labelled theoretical
+
 ## Now — premium biomedical liquid interface
 - [x] Cinematic violet/white landing experience with strategic liquid-glass surfaces
 - [x] Uploaded DNA video used as the cinematic background with poster and reduced-motion fallback
