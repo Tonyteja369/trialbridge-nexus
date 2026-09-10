@@ -3,7 +3,7 @@ import { PublicFooter, PublicNav } from "@/components/PublicNav";
 import { DiseaseExplorer } from "@/components/DiseaseExplorer";
 import { SafetyBanner } from "@/components/SafetyBanner";
 
-export const Route = createFileRoute("/diseases/")({
+export const Route = createFileRoute("/_protected/diseases/")({
   head: () => ({
     meta: [
       { title: "Research by Disease Area — ClinQSphereX" },

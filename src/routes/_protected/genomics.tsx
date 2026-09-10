@@ -19,7 +19,7 @@ import {
   type IngestRun,
 } from "@/lib/research-sources.functions";
 
-export const Route = createFileRoute("/genomics")({
+export const Route = createFileRoute("/_protected/genomics")({
   head: () => ({
     meta: [
       { title: "Genomic Intelligence Engine — ClinQSphereX" },
