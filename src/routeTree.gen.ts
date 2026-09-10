@@ -17,8 +17,10 @@ import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedParticipantsRouteImport } from './routes/_authenticated/participants'
+import { Route as AuthenticatedQuantumLabRouteImport } from './routes/_authenticated/quantum-lab'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedCandidatesCandidateIdRouteImport } from './routes/_authenticated/candidates.$candidateId'
 import { Route as AuthenticatedStudiesIndexRouteImport } from './routes/_authenticated/studies.index'
@@ -63,6 +65,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
+  id: '/governance',
+  path: '/governance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
   id: '/operations',
   path: '/operations',
@@ -74,6 +81,11 @@ const AuthenticatedParticipantsRoute =
     path: '/participants',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedQuantumLabRoute = AuthenticatedQuantumLabRouteImport.update({
+  id: '/quantum-lab',
+  path: '/quantum-lab',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -106,8 +118,10 @@ export interface FileRoutesByFullPath {
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
+  '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -121,8 +135,10 @@ export interface FileRoutesByTo {
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
+  '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -138,8 +154,10 @@ export interface FileRoutesById {
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/participants': typeof AuthenticatedParticipantsRoute
+  '/_authenticated/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/_authenticated/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -155,8 +173,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/security'
     | '/dashboard'
+    | '/governance'
     | '/operations'
     | '/participants'
+    | '/quantum-lab'
     | '/tasks'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
@@ -170,8 +190,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/security'
     | '/dashboard'
+    | '/governance'
     | '/operations'
     | '/participants'
+    | '/quantum-lab'
     | '/tasks'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
@@ -186,8 +208,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/security'
     | '/_authenticated/dashboard'
+    | '/_authenticated/governance'
     | '/_authenticated/operations'
     | '/_authenticated/participants'
+    | '/_authenticated/quantum-lab'
     | '/_authenticated/tasks'
     | '/_authenticated/candidates/$candidateId'
     | '/_authenticated/studies/$studyId'
@@ -262,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/governance': {
+      id: '/_authenticated/governance'
+      path: '/governance'
+      fullPath: '/governance'
+      preLoaderRoute: typeof AuthenticatedGovernanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/operations': {
       id: '/_authenticated/operations'
       path: '/operations'
@@ -274,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/participants'
       fullPath: '/participants'
       preLoaderRoute: typeof AuthenticatedParticipantsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/quantum-lab': {
+      id: '/_authenticated/quantum-lab'
+      path: '/quantum-lab'
+      fullPath: '/quantum-lab'
+      preLoaderRoute: typeof AuthenticatedQuantumLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -309,8 +347,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedParticipantsRoute: typeof AuthenticatedParticipantsRoute
+  AuthenticatedQuantumLabRoute: typeof AuthenticatedQuantumLabRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedCandidatesCandidateIdRoute: typeof AuthenticatedCandidatesCandidateIdRoute
   AuthenticatedStudiesStudyIdRoute: typeof AuthenticatedStudiesStudyIdRoute
@@ -319,8 +359,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedParticipantsRoute: AuthenticatedParticipantsRoute,
+  AuthenticatedQuantumLabRoute: AuthenticatedQuantumLabRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedCandidatesCandidateIdRoute:
     AuthenticatedCandidatesCandidateIdRoute,

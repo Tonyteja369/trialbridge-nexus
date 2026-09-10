@@ -3,10 +3,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Activity,
+  Atom,
   FlaskConical,
   LayoutDashboard,
   ListChecks,
   LogOut,
+  ShieldCheck,
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,6 +21,8 @@ const nav = [
   { to: "/participants", label: "Participants", icon: Users },
   { to: "/tasks", label: "Tasks & visits", icon: ListChecks },
   { to: "/operations", label: "Operations", icon: Activity },
+  { to: "/quantum-lab", label: "Quantum lab", icon: Atom },
+  { to: "/governance", label: "Governance", icon: ShieldCheck },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
