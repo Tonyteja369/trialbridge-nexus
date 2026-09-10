@@ -31,7 +31,7 @@ const pipeline = [
   "Clinical features",
   "Feature encoding",
   "Quantum feature map",
-  "Qiskit Aer simulation",
+  "Statevector simulation",
   "Quantum state",
   "Fidelity kernel",
   "Kernel SVM",
@@ -81,9 +81,9 @@ function QuantumLab() {
           ))}
         </ol>
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          The quantum pipeline runs offline in the repository&apos;s <code>quantum/</code> package on
-          the Qiskit Aer simulator. The deployed application itself performs no quantum computation:
-          the site and slot allocation model below is expressed as a QUBO and solved classically.
+          The benchmark below executes this pipeline inside the application as a full statevector
+          simulation on classical hardware — not quantum hardware. The site and slot allocation
+          model is separate: it is expressed as a QUBO and solved classically.
         </p>
       </section>
 
