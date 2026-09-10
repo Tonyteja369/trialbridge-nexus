@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Activity,
   Atom,
+  BookOpen,
+  Dna,
+  HeartPulse,
   FlaskConical,
   LayoutDashboard,
   ListChecks,
@@ -24,6 +27,9 @@ const nav = [
   { to: "/operations", label: "Operations", icon: Activity },
   { to: "/quantum-lab", label: "Quantum lab", icon: Atom },
   { to: "/governance", label: "Governance", icon: ShieldCheck },
+  { to: "/diseases", label: "Diseases", icon: HeartPulse },
+  { to: "/research", label: "Research", icon: BookOpen },
+  { to: "/genomics", label: "Genomics", icon: Dna },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

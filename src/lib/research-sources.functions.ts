@@ -17,18 +17,25 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function retryFetch(url: string | URL, timeoutMs: number, accept: string, source: string) {
   let lastError = "request failed";
+  let attempts = 0;
+  const startedAt = Date.now();
   for (let attempt = 1; attempt <= 3; attempt += 1) {
+    attempts = attempt;
+    const attemptStart = Date.now();
     try {
       const res = await fetch(url, { headers: { accept }, signal: AbortSignal.timeout(timeoutMs) });
       if (res.ok) return res;
-      lastError = `HTTP ${res.status}`;
+      lastError = `HTTP ${res.status} after ${Date.now() - attemptStart} ms`;
       if (res.status < 500 && res.status !== 429) break;
     } catch (error) {
-      lastError = error instanceof Error ? error.message : "request failed";
+      const reason = error instanceof Error ? error.message : "request failed";
+      lastError = `${reason} after ${Date.now() - attemptStart} ms`;
     }
     if (attempt < 3) await wait(200 * 2 ** (attempt - 1));
   }
-  throw new Error(`${source} unavailable after 3 attempts (${lastError})`);
+  throw new Error(
+    `${source} unavailable — ${attempts} attempt${attempts === 1 ? "" : "s"} in ${Date.now() - startedAt} ms; last failure: ${lastError}`,
+  );
 }
 
 async function cached<T>(key: string, load: () => Promise<T>, ttlMs = CACHE_TTL_MS): Promise<T> {
