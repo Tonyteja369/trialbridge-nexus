@@ -516,7 +516,7 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
           qubo_size: qubits,
           runtime_ms: Math.round(qTotal + cTotal),
           assignment: [],
-          metrics: result as unknown as Record<string, unknown>,
+          metrics: JSON.parse(JSON.stringify(result)),
           created_by: userId,
         });
         if (error) {
