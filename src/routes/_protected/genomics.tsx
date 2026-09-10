@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, Activity, Database, Dna, Gauge, Timer } from "lucide-react";
+import { ExternalLink, Activity, Database, Dna, Gauge, Timer, Download } from "lucide-react";
 import { PublicNav, PublicFooter } from "@/components/PublicNav";
 import { BiomedicalVideo } from "@/components/BiomedicalVideo";
 import { TrialSearch } from "@/components/TrialSearch";
@@ -46,6 +46,38 @@ const nf = new Intl.NumberFormat("en-US");
 const fmtBytes = (b: number) =>
   b >= 1_000_000 ? `${(b / 1_048_576).toFixed(2)} MB` : `${(b / 1024).toFixed(1)} KB`;
 
+function downloadReport(run: IngestRun, format: "json" | "csv") {
+  const exportedAt = new Date().toISOString();
+  const ids = run.excerpts.map((entry) => entry.id);
+  const report = { source: "NCBI Nucleotide (E-utilities)", exportedAt, ...run, retrievedIds: ids };
+  let body: string;
+  let type: string;
+  if (format === "json") {
+    body = JSON.stringify(report, null, 2);
+    type = "application/json";
+  } else {
+    const rows: [string, string | number][] = [
+      ["source", report.source], ["query", run.query], ["requested", run.requested],
+      ["sourceMatchingRecords", run.sourceMatchingRecords ?? ""], ["recordsRetrieved", run.recordsRetrieved],
+      ["recordsProcessed", run.recordsProcessed], ["basesProcessed", run.basesProcessed],
+      ["bytesReceived", run.bytesReceived], ["searchMs", run.searchMs], ["downloadMs", run.downloadMs],
+      ["parseMs", run.parseMs], ["processMs", run.processMs], ["totalMs", run.totalMs],
+      ["recordsPerSecond", run.recordsPerSecond], ["basesPerSecond", run.basesPerSecond],
+      ["basesPerRecordCap", run.basesPerRecordCap], ["retrievedAt", run.retrievedAt],
+      ["exportedAt", exportedAt], ["retrievedIds", ids.join("|")],
+    ];
+    const escape = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`;
+    body = `field,value\n${rows.map(([key, value]) => `${escape(key)},${escape(value)}`).join("\n")}`;
+    type = "text/csv";
+  }
+  const blobUrl = URL.createObjectURL(new Blob([body], { type }));
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = `clinqspherex-genomics-${run.retrievedAt.replaceAll(":", "-")}.${format}`;
+  link.click();
+  URL.revokeObjectURL(blobUrl);
+}
+
 function Metric({
   label,
   value,
@@ -79,24 +111,27 @@ function GenomicsPage() {
     queryKey: ["research-sources"],
     queryFn: () => sourcesFn({}),
     staleTime: 60_000,
+    retry: false,
   });
 
   const pubmed = useQuery({
     queryKey: ["pubmed", disease.condition],
     queryFn: () => pubmedFn({ data: { term: disease.condition, pageSize: 6 } }),
     staleTime: 5 * 60_000,
+    retry: false,
   });
 
   const uniprot = useQuery({
     queryKey: ["uniprot", disease.condition],
     queryFn: () => uniprotFn({ data: { term: disease.condition, pageSize: 5 } }),
     staleTime: 5 * 60_000,
+    retry: false,
   });
 
   const ingest = useMutation<IngestRun, Error, { term: string; records: number }>({
     mutationFn: (vars) => ingestFn({ data: vars }),
   });
-  const run = ingest.data;
+  const run = ingest.error ? undefined : ingest.data;
 
   const projections = run
     ? [1_000_000, 10_000_000, 100_000_000, 1_000_000_000].map((n) => ({
@@ -237,7 +272,10 @@ function GenomicsPage() {
                 </button>
               ))}
               <Button
-                onClick={() => ingest.mutate({ term: disease.condition, records })}
+                 onClick={() => {
+                   ingest.reset();
+                   ingest.mutate({ term: disease.condition, records });
+                 }}
                 disabled={ingest.isPending}
                 className="ml-auto"
               >
@@ -260,6 +298,19 @@ function GenomicsPage() {
 
             {run && (
               <div className="space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    Export contains only this successful run, its measured timings, retrieved IDs and timestamps.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => downloadReport(run, "json")}>
+                      <Download aria-hidden /> JSON
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => downloadReport(run, "csv")}>
+                      <Download aria-hidden /> CSV
+                    </Button>
+                  </div>
+                </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   <div className="liquid-glass liquid-glass-evidence p-4">
                     <p className="text-[0.66rem] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -392,7 +443,7 @@ function GenomicsPage() {
                     message={`SOURCE OFFLINE — PubMed: ${(pubmed.error as Error).message}`}
                   />
                 )}
-                {pubmed.data?.publications.map((p) => (
+                 {!pubmed.error && pubmed.data?.publications.map((p) => (
                   <article key={p.pmid} className="liquid-glass liquid-glass-card p-4">
                     <a
                       href={p.url}
@@ -410,7 +461,7 @@ function GenomicsPage() {
                     )}
                   </article>
                 ))}
-                {pubmed.data && (
+                 {!pubmed.error && pubmed.data && (
                   <p className="text-xs text-muted-foreground">
                     Source: NCBI PubMed E-utilities ·{" "}
                     {pubmed.data.totalCount !== null
@@ -437,7 +488,7 @@ function GenomicsPage() {
                     message={`SOURCE OFFLINE — UniProt: ${(uniprot.error as Error).message}`}
                   />
                 )}
-                {uniprot.data?.proteins.map((p) => (
+                 {!uniprot.error && uniprot.data?.proteins.map((p) => (
                   <article key={p.accession} className="liquid-glass liquid-glass-card p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <a
@@ -462,7 +513,7 @@ function GenomicsPage() {
                     )}
                   </article>
                 ))}
-                {uniprot.data && (
+                 {!uniprot.error && uniprot.data && (
                   <p className="text-xs text-muted-foreground">
                     Source: UniProtKB (public biological database) · Retrieved{" "}
                     {new Date(uniprot.data.retrievedAt).toLocaleString()} in{" "}
