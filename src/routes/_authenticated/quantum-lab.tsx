@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
 import { GenomicBenchmark } from "@/components/GenomicBenchmark";
+import { HeartBenchmark } from "@/components/HeartBenchmark";
+
 
 export const Route = createFileRoute("/_authenticated/quantum-lab")({
   head: () => ({
@@ -29,22 +31,13 @@ const pipeline = [
   "Clinical features",
   "Feature encoding",
   "Quantum feature map",
-  "Qiskit Aer simulation",
+  "Statevector simulation",
   "Quantum state",
   "Fidelity kernel",
   "Kernel SVM",
   "Prediction",
 ];
 
-const metrics = [
-  "Accuracy",
-  "Precision",
-  "Recall",
-  "F1",
-  "ROC-AUC",
-  "Training time",
-  "Inference time",
-];
 
 function QuantumLab() {
   const { data, isLoading, error } = useQuery({
@@ -88,51 +81,21 @@ function QuantumLab() {
           ))}
         </ol>
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          The quantum pipeline runs offline in the repository&apos;s <code>quantum/</code> package on
-          the Qiskit Aer simulator. The deployed application itself performs no quantum computation:
-          the site and slot allocation model below is expressed as a QUBO and solved classically.
+          The benchmark below executes this pipeline inside the application as a full statevector
+          simulation on classical hardware — not quantum hardware. The site and slot allocation
+          model is separate: it is expressed as a QUBO and solved classically.
         </p>
       </section>
 
-      <section aria-labelledby="comparison" className="surface p-5">
+      <section aria-labelledby="comparison">
         <h2 id="comparison" className="text-base font-semibold">
           Classical baseline vs quantum kernel
         </h2>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[32rem] text-sm">
-            <caption className="sr-only">
-              Evaluation metrics for the classical baseline and quantum kernel models
-            </caption>
-            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th scope="col" className="px-4 py-2.5">Metric</th>
-                <th scope="col" className="px-4 py-2.5">Classical baseline</th>
-                <th scope="col" className="px-4 py-2.5">Quantum kernel</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {metrics.map((m) => (
-                <tr key={m}>
-                  <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                    {m}
-                  </th>
-                  <td className="px-4 py-2.5 text-muted-foreground">Not evaluated</td>
-                  <td className="px-4 py-2.5 text-muted-foreground">Not evaluated</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-4">
+          <HeartBenchmark />
         </div>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-          No benchmark run has been recorded in this workspace yet, so every cell reads &ldquo;Not
-          evaluated&rdquo;. Values appear here only when a real evaluation has been executed and
-          stored.
-        </p>
-        <p className="mt-3 rounded-md border border-border bg-secondary p-3 text-sm">
-          Quantum performance is experimentally evaluated against classical baselines. ClinQSphereX
-          does not assume quantum advantage.
-        </p>
       </section>
+
 
 
       <section aria-labelledby="genomic-benchmark">
