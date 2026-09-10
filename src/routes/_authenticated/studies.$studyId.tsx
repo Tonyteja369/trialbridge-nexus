@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { runScreening, runAllocation } from "@/lib/trialbridge.functions";
 import { StatusPill } from "@/components/StatusPill";
 import { SafetyBanner } from "@/components/SafetyBanner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
+import { OutcomeBadge } from "@/components/OutcomeBadge";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/studies/$studyId")({
@@ -35,6 +37,10 @@ function StudyPage() {
   const screen = useServerFn(runScreening);
   const allocate = useServerFn(runAllocation);
   const [tab, setTab] = useState<"pipeline" | "criteria" | "sites" | "allocation">("pipeline");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [confidenceFilter, setConfidenceFilter] = useState("all");
+  const [reviewFilter, setReviewFilter] = useState("all");
 
   const { data, isLoading } = useQuery({
     queryKey: ["study", studyId],
