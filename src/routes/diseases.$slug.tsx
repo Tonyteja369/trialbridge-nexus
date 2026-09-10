@@ -60,7 +60,7 @@ function DiseasePage() {
               </p>
             </div>
             {visual && (
-              <figure className="surface-strong relative overflow-hidden rounded-2xl">
+              <figure className="surface-strong overflow-hidden rounded-2xl">
                 <img
                   src={visual.url}
                   alt={visual.alt}
@@ -68,7 +68,7 @@ function DiseasePage() {
                   height={1024}
                   className="aspect-[4/3] w-full object-cover"
                 />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent px-4 py-3 text-xs text-muted-foreground">
+                <figcaption className="border-t border-border/70 px-4 py-3 text-xs text-muted-foreground">
                   Illustrative scientific visualization — not patient imagery or a clinical finding.
                 </figcaption>
               </figure>
