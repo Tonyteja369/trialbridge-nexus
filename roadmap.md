@@ -1,7 +1,7 @@
-# Diagnosphere.X roadmap
+# ClinQSphereX roadmap
 
 ## Now — rebrand + design system (this turn)
-- [x] Rename TrialBridge → Diagnosphere.X everywhere (nav, titles, metadata, copy)
+- [x] Rename ClinQSphereX → ClinQSphereX everywhere (nav, titles, metadata, copy)
 - [x] Arctic Signal palette as semantic tokens (#0DB8D3 #1B7FDC #065B98 #193546)
 - [x] Sora headings + Manrope body
 - [x] Glass surfaces, depth, restrained motion

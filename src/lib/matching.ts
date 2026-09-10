@@ -1,5 +1,5 @@
 /**
- * Diagnosphere.X eligibility screening engine.
+ * ClinQSphereX eligibility screening engine.
  *
  * Deterministic, rule-based and fully explainable. It produces a RANKED
  * SHORTLIST plus a per-criterion explanation. It never decides eligibility:

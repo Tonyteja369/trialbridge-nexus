@@ -1,4 +1,4 @@
-# Diagnosphere.X quantum experiments
+# ClinQSphereX quantum experiments
 
 ## What the quantum component is for
 
@@ -7,7 +7,7 @@
 > travel burden while maximising match quality**."
 
 That is a constrained combinatorial assignment problem, which maps naturally to a
-QUBO and therefore to QAOA. It is the only part of Diagnosphere.X where a quantum
+QUBO and therefore to QAOA. It is the only part of ClinQSphereX where a quantum
 formulation is honest — screening itself is a rule-based, explainable
 classical engine, and a quantum classifier there would add opacity to a workflow
 that must stay reviewable.
