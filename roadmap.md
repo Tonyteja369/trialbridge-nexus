@@ -7,6 +7,12 @@
 - [x] Real sequence excerpts with accession, source link and retrieval timestamp
 - [x] Source scale vs current run kept visually separate; projections labelled theoretical
 
+## Current — source resilience, exports, and media accessibility
+- [ ] Add bounded retries and independent fresh-result caching for each genomic source
+- [ ] Show SOURCE OFFLINE without rendering retained or substitute records after failures
+- [ ] Export the current measured NCBI run as JSON or CSV with IDs and retrieval timestamps
+- [ ] Pause the authentication video for reduced motion and low-power/data-saving conditions, with poster fallback
+
 ## Now — premium biomedical liquid interface
 - [x] Cinematic violet/white landing experience with strategic liquid-glass surfaces
 - [x] Uploaded DNA video used as the cinematic background with poster and reduced-motion fallback
