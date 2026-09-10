@@ -27,6 +27,12 @@ const tones: Record<string, string> = {
   dead_letter: "bg-destructive/10 text-destructive",
   open: "bg-secondary text-secondary-foreground",
   done: "bg-success/15 text-success",
+  unknown: "bg-warning/15 text-warning",
+  requires_review: "bg-accent text-accent-foreground",
+  overdue: "bg-destructive/10 text-destructive",
+  upcoming: "bg-secondary text-secondary-foreground",
+  in_progress: "bg-accent/60 text-accent-foreground",
+  completed: "bg-success/15 text-success",
 };
 
 export function StatusPill({ value, className }: { value: string; className?: string }) {

@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { runScreening, runAllocation } from "@/lib/trialbridge.functions";
 import { StatusPill } from "@/components/StatusPill";
 import { SafetyBanner } from "@/components/SafetyBanner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
+import { OutcomeBadge } from "@/components/OutcomeBadge";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/studies/$studyId")({
@@ -35,6 +37,10 @@ function StudyPage() {
   const screen = useServerFn(runScreening);
   const allocate = useServerFn(runAllocation);
   const [tab, setTab] = useState<"pipeline" | "criteria" | "sites" | "allocation">("pipeline");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [confidenceFilter, setConfidenceFilter] = useState("all");
+  const [reviewFilter, setReviewFilter] = useState("all");
 
   const { data, isLoading } = useQuery({
     queryKey: ["study", studyId],
@@ -86,8 +92,20 @@ function StudyPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading || !data?.study) return <p className="text-sm text-muted-foreground">Loading study…</p>;
+  if (isLoading) return <LoadingState rows={3} label="Loading study" />;
+  if (!data?.study) return <ErrorState message="This study could not be found." />;
   const study = data.study;
+
+  const candidates = (data.candidates as any[]).filter((c) => {
+    const term = search.trim().toLowerCase();
+    if (term && !String(c.participants?.code ?? "").toLowerCase().includes(term)) return false;
+    if (statusFilter !== "all" && c.status !== statusFilter) return false;
+    if (confidenceFilter !== "all" && c.confidence !== confidenceFilter) return false;
+    if (reviewFilter === "reviewed" && !c.reviewed_at) return false;
+    if (reviewFilter === "requires_review" && c.reviewed_at) return false;
+    return true;
+  });
+  const statusOptions = Array.from(new Set((data.candidates as any[]).map((c) => c.status)));
 
   return (
     <div className="space-y-6">
@@ -133,66 +151,155 @@ function StudyPage() {
       </nav>
 
       {tab === "pipeline" && (
-        <section className="surface overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Participant</th>
-                <th className="px-4 py-3">Match</th>
-                <th className="px-4 py-3">Confidence</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Screened against</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {data.candidates.map((c: any) => {
-                const stale = c.screened_protocol_version !== study.protocol_version;
-                return (
-                  <tr key={c.id}>
-                    <td className="px-4 py-3">
-                      <span className="font-medium">{c.participants?.code}</span>
-                      <span className="block text-xs text-muted-foreground">
-                        {c.participants?.age ?? "?"} y · {c.participants?.sex} ·{" "}
-                        {c.participants?.city}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 tabular-nums">{Number(c.match_score)}</td>
-                    <td className="px-4 py-3">
-                      <StatusPill value={c.confidence} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusPill value={c.status} />
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {c.screened_protocol_version}
-                      {stale && (
-                        <span className="ml-2 rounded bg-destructive/10 px-1.5 py-0.5 text-destructive">
-                          stale — re-screen
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        to="/candidates/$candidateId"
-                        params={{ candidateId: c.id }}
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        Review
-                      </Link>
-                    </td>
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="min-w-[12rem] flex-1">
+              <label htmlFor="q" className="text-xs font-medium text-muted-foreground">
+                Search candidate ID
+              </label>
+              <input
+                id="q"
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="e.g. P-0042"
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            </div>
+            {[
+              {
+                id: "f-status",
+                label: "Status",
+                value: statusFilter,
+                set: setStatusFilter,
+                options: statusOptions.map((s) => [s, String(s).replace(/_/g, " ")] as const),
+              },
+              {
+                id: "f-conf",
+                label: "Confidence",
+                value: confidenceFilter,
+                set: setConfidenceFilter,
+                options: [
+                  ["high", "high"],
+                  ["medium", "medium"],
+                  ["low", "low"],
+                ] as const,
+              },
+              {
+                id: "f-review",
+                label: "Review",
+                value: reviewFilter,
+                set: setReviewFilter,
+                options: [
+                  ["requires_review", "requires review"],
+                  ["reviewed", "reviewed"],
+                ] as const,
+              },
+            ].map((f) => (
+              <div key={f.id}>
+                <label htmlFor={f.id} className="text-xs font-medium text-muted-foreground">
+                  {f.label}
+                </label>
+                <select
+                  id={f.id}
+                  value={f.value}
+                  onChange={(e) => f.set(e.target.value)}
+                  className="mt-1 block rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+                >
+                  <option value="all">All</option>
+                  {f.options.map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Showing {candidates.length} of {data.candidates.length} candidates.
+          </p>
+
+          {data.candidates.length === 0 ? (
+            <EmptyState
+              title="No candidates have been added to this study yet."
+              description="Run screening to build a shortlist of potentially eligible participants for human review."
+            />
+          ) : candidates.length === 0 ? (
+            <EmptyState
+              title="No candidates match these filters."
+              description="Clear the search or filters to see the full pipeline."
+            />
+          ) : (
+            <div className="surface overflow-x-auto">
+              <table className="w-full min-w-[46rem] text-sm">
+                <caption className="sr-only">Candidate pipeline for this study</caption>
+                <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th scope="col" className="px-4 py-3">Candidate</th>
+                    <th scope="col" className="px-4 py-3">Match</th>
+                    <th scope="col" className="px-4 py-3">Confidence</th>
+                    <th scope="col" className="px-4 py-3">Status</th>
+                    <th scope="col" className="px-4 py-3">Review</th>
+                    <th scope="col" className="px-4 py-3">Screened against</th>
+                    <th scope="col" className="px-4 py-3">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
-                );
-              })}
-              {data.candidates.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    No candidates yet. Run screening to build a shortlist for human review.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {candidates.map((c: any) => {
+                    const stale = c.screened_protocol_version !== study.protocol_version;
+                    return (
+                      <tr key={c.id}>
+                        <td className="px-4 py-3">
+                          <span className="font-medium">{c.participants?.code}</span>
+                          <span className="block text-xs text-muted-foreground">
+                            {c.participants?.age ?? "?"} y · {c.participants?.sex} ·{" "}
+                            {c.participants?.city}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">{Number(c.match_score)}</td>
+                        <td className="px-4 py-3">
+                          <StatusPill value={c.confidence} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusPill value={c.status} />
+                        </td>
+                        <td className="px-4 py-3">
+                          {c.reviewed_at ? (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(c.reviewed_at).toLocaleDateString()}
+                            </span>
+                          ) : (
+                            <OutcomeBadge outcome="requires_review" />
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {c.screened_protocol_version}
+                          {stale && (
+                            <span className="ml-2 rounded bg-destructive/10 px-1.5 py-0.5 text-destructive">
+                              stale — re-screen
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Link
+                            to="/candidates/$candidateId"
+                            params={{ candidateId: c.id }}
+                            className="text-sm font-medium text-primary hover:underline"
+                          >
+                            Review
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       )}
 

@@ -11,10 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PlatformRouteImport } from './routes/platform'
+import { Route as ResearchRouteImport } from './routes/research'
+import { Route as SecurityRouteImport } from './routes/security'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGovernanceRouteImport } from './routes/_authenticated/governance'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedParticipantsRouteImport } from './routes/_authenticated/participants'
+import { Route as AuthenticatedQuantumLabRouteImport } from './routes/_authenticated/quantum-lab'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedCandidatesCandidateIdRouteImport } from './routes/_authenticated/candidates.$candidateId'
 import { Route as AuthenticatedStudiesIndexRouteImport } from './routes/_authenticated/studies.index'
@@ -29,14 +35,39 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlatformRoute = PlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchRoute = ResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGovernanceRoute = AuthenticatedGovernanceRouteImport.update({
+  id: '/governance',
+  path: '/governance',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
@@ -50,6 +81,11 @@ const AuthenticatedParticipantsRoute =
     path: '/participants',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedQuantumLabRoute = AuthenticatedQuantumLabRouteImport.update({
+  id: '/quantum-lab',
+  path: '/quantum-lab',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -76,10 +112,16 @@ const AuthenticatedStudiesStudyIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/platform': typeof PlatformRoute
+  '/research': typeof ResearchRoute
+  '/security': typeof SecurityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
+  '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -87,10 +129,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/platform': typeof PlatformRoute
+  '/research': typeof ResearchRoute
+  '/security': typeof SecurityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/governance': typeof AuthenticatedGovernanceRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/participants': typeof AuthenticatedParticipantsRoute
+  '/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -100,10 +148,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/platform': typeof PlatformRoute
+  '/research': typeof ResearchRoute
+  '/security': typeof SecurityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/governance': typeof AuthenticatedGovernanceRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/participants': typeof AuthenticatedParticipantsRoute
+  '/_authenticated/quantum-lab': typeof AuthenticatedQuantumLabRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/candidates/$candidateId': typeof AuthenticatedCandidatesCandidateIdRoute
   '/_authenticated/studies/$studyId': typeof AuthenticatedStudiesStudyIdRoute
@@ -113,10 +167,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
+    | '/platform'
+    | '/research'
+    | '/security'
     | '/dashboard'
+    | '/governance'
     | '/operations'
     | '/participants'
+    | '/quantum-lab'
     | '/tasks'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
@@ -124,10 +184,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
+    | '/platform'
+    | '/research'
+    | '/security'
     | '/dashboard'
+    | '/governance'
     | '/operations'
     | '/participants'
+    | '/quantum-lab'
     | '/tasks'
     | '/candidates/$candidateId'
     | '/studies/$studyId'
@@ -136,10 +202,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
+    | '/platform'
+    | '/research'
+    | '/security'
     | '/_authenticated/dashboard'
+    | '/_authenticated/governance'
     | '/_authenticated/operations'
     | '/_authenticated/participants'
+    | '/_authenticated/quantum-lab'
     | '/_authenticated/tasks'
     | '/_authenticated/candidates/$candidateId'
     | '/_authenticated/studies/$studyId'
@@ -149,7 +221,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  PlatformRoute: typeof PlatformRoute
+  ResearchRoute: typeof ResearchRoute
+  SecurityRoute: typeof SecurityRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -168,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -175,11 +258,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/platform': {
+      id: '/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof PlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research': {
+      id: '/research'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/governance': {
+      id: '/_authenticated/governance'
+      path: '/governance'
+      fullPath: '/governance'
+      preLoaderRoute: typeof AuthenticatedGovernanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/operations': {
@@ -194,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/participants'
       fullPath: '/participants'
       preLoaderRoute: typeof AuthenticatedParticipantsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/quantum-lab': {
+      id: '/_authenticated/quantum-lab'
+      path: '/quantum-lab'
+      fullPath: '/quantum-lab'
+      preLoaderRoute: typeof AuthenticatedQuantumLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -229,8 +347,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGovernanceRoute: typeof AuthenticatedGovernanceRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedParticipantsRoute: typeof AuthenticatedParticipantsRoute
+  AuthenticatedQuantumLabRoute: typeof AuthenticatedQuantumLabRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedCandidatesCandidateIdRoute: typeof AuthenticatedCandidatesCandidateIdRoute
   AuthenticatedStudiesStudyIdRoute: typeof AuthenticatedStudiesStudyIdRoute
@@ -239,8 +359,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGovernanceRoute: AuthenticatedGovernanceRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedParticipantsRoute: AuthenticatedParticipantsRoute,
+  AuthenticatedQuantumLabRoute: AuthenticatedQuantumLabRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedCandidatesCandidateIdRoute:
     AuthenticatedCandidatesCandidateIdRoute,
@@ -254,7 +376,11 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  PlatformRoute: PlatformRoute,
+  ResearchRoute: ResearchRoute,
+  SecurityRoute: SecurityRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
