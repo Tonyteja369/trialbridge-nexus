@@ -38,7 +38,7 @@ export function SourceNote({
   href?: string;
 }) {
   return (
-    <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+    <p className="liquid-glass liquid-glass-evidence mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5 text-xs text-muted-foreground">
       <ProvenanceTag kind={kind} />
       <span>
         Source:{" "}

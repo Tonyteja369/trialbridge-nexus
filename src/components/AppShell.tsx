@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 import { Wordmark } from "@/components/Wordmark";
+import { Button } from "@/components/ui/button";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -39,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-primary/15 bg-secondary/55 px-4 py-6 backdrop-blur-xl md:flex">
+      <aside className="liquid-glass liquid-glass-nav sticky top-0 hidden h-screen w-64 shrink-0 flex-col rounded-none border-y-0 border-l-0 px-4 py-6 md:flex">
         <Link to="/dashboard" className="px-1">
           <Wordmark />
         </Link>
@@ -61,26 +62,27 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <button
+        <Button
+          variant="ghost"
           onClick={signOut}
-          className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-card"
+          className="justify-start px-3 text-muted-foreground"
         >
           <LogOut className="size-4" aria-hidden />
           Sign out
-        </button>
+        </Button>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20 flex items-center gap-3 overflow-x-auto border-b border-border bg-card/80 px-4 py-2 backdrop-blur-xl md:hidden">
+        <nav aria-label="Workspace" className="liquid-glass liquid-glass-nav sticky top-0 z-20 flex items-center gap-3 overflow-x-auto rounded-none border-x-0 border-t-0 px-4 py-2 md:hidden">
           {nav.map((item) => (
             <Link key={item.to} to={item.to} className="whitespace-nowrap text-sm">
               {item.label}
             </Link>
           ))}
-          <button onClick={signOut} className="whitespace-nowrap text-sm text-muted-foreground">
+          <Button onClick={signOut} variant="ghost" size="sm" className="whitespace-nowrap text-muted-foreground">
             Sign out
-          </button>
-        </div>
+          </Button>
+        </nav>
         <main className="relative mx-auto w-full max-w-6xl flex-1 px-5 py-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-72 before:bg-[radial-gradient(circle_at_65%_0%,var(--violet-100),transparent_65%)]">{children}</main>
       </div>
     </div>

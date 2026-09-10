@@ -11,7 +11,7 @@ const links = [
 
 export function PublicNav() {
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/75 backdrop-blur-xl">
+    <header className="liquid-glass liquid-glass-nav sticky top-0 z-30 rounded-none border-x-0 border-t-0">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <Link to="/" aria-label="ClinQSphereX home">
           <Wordmark />
