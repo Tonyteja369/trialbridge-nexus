@@ -86,8 +86,20 @@ function StudyPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading || !data?.study) return <p className="text-sm text-muted-foreground">Loading study…</p>;
+  if (isLoading) return <LoadingState rows={3} label="Loading study" />;
+  if (!data?.study) return <ErrorState message="This study could not be found." />;
   const study = data.study;
+
+  const candidates = (data.candidates as any[]).filter((c) => {
+    const term = search.trim().toLowerCase();
+    if (term && !String(c.participants?.code ?? "").toLowerCase().includes(term)) return false;
+    if (statusFilter !== "all" && c.status !== statusFilter) return false;
+    if (confidenceFilter !== "all" && c.confidence !== confidenceFilter) return false;
+    if (reviewFilter === "reviewed" && !c.reviewed_at) return false;
+    if (reviewFilter === "requires_review" && c.reviewed_at) return false;
+    return true;
+  });
+  const statusOptions = Array.from(new Set((data.candidates as any[]).map((c) => c.status)));
 
   return (
     <div className="space-y-6">
