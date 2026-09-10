@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { Wordmark } from "@/components/Wordmark";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -34,11 +35,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-ink/70 px-4 py-6 text-ink-foreground backdrop-blur-xl md:flex">
-        <Link to="/dashboard" className="px-2 font-display text-lg font-semibold">
-          Diagnosphere<span className="text-primary">.X</span>
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-secondary/40 px-4 py-6 md:flex">
+        <Link to="/dashboard" className="px-1">
+          <Wordmark />
         </Link>
-        <p className="mt-1 px-2 text-xs text-ink-muted">Research operations</p>
+        <p className="mt-1 px-1 text-xs text-muted-foreground">Research operations</p>
         <nav className="mt-8 flex flex-1 flex-col gap-1">
           {nav.map((item) => (
             <Link
@@ -47,8 +48,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               className={cn(
                 "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
                 pathname.startsWith(item.to)
-                  ? "bg-white/10 font-medium text-ink-foreground"
-                  : "text-ink-muted hover:bg-white/5",
+                  ? "bg-card font-medium text-primary shadow-[inset_0_0_0_1px_var(--border)]"
+                  : "text-muted-foreground hover:bg-card",
               )}
             >
               <item.icon className="size-4" aria-hidden />
@@ -58,7 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <button
           onClick={signOut}
-          className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-ink-muted transition-colors hover:bg-white/5"
+          className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-card"
         >
           <LogOut className="size-4" aria-hidden />
           Sign out

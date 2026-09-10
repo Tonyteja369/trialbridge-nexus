@@ -79,17 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Diagnosphere.X — Clinical Research Operations" },
+      { title: "ClinQSphereX — Clinical Research Operations" },
       {
         name: "description",
         content:
-          "Clinical trial recruitment, participant coordination and research operations with explainable screening support and researcher review at every step.",
+          "Clinical trial recruitment, participant coordination and research operations with evidence-based screening support and researcher review at every step.",
       },
-      { property: "og:title", content: "Diagnosphere.X — Clinical Research Operations" },
+      { property: "og:title", content: "ClinQSphereX — Clinical Research Operations" },
       {
         property: "og:description",
         content:
-          "Explainable screening support, consent tracking and research coordination — researchers decide.",
+          "Evidence-based screening support, consent tracking and research coordination — researchers decide.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
