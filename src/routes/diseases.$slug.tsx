@@ -5,6 +5,7 @@ import { TrialSearch } from "@/components/TrialSearch";
 import { OutcomeBadge } from "@/components/OutcomeBadge";
 import { ProvenanceTag } from "@/components/DataProvenance";
 import { getDisease, diseases } from "@/lib/diseases";
+import { diseaseVisual } from "@/lib/disease-visuals";
 
 export const Route = createFileRoute("/diseases/$slug")({
   loader: ({ params }) => {
@@ -39,6 +40,7 @@ const outcomes = ["met", "not_met", "unknown"] as const;
 function DiseasePage() {
   const { disease } = Route.useLoaderData();
   const others = diseases.filter((d) => d.slug !== disease.slug);
+  const visual = diseaseVisual(disease.slug);
 
   return (
     <>
@@ -48,12 +50,30 @@ function DiseasePage() {
           <Link to="/diseases" className="text-sm text-muted-foreground hover:text-foreground">
             ← All disease areas
           </Link>
-          <h1 className="mt-4 font-display text-3xl font-semibold sm:text-4xl">
-            {disease.name} Research Intelligence
-          </h1>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">
-            {disease.overview}
-          </p>
+          <div className="mt-4 grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <h1 className="font-display text-3xl font-semibold sm:text-4xl">
+                {disease.name} Research Intelligence
+              </h1>
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">
+                {disease.overview}
+              </p>
+            </div>
+            {visual && (
+              <figure className="surface-strong overflow-hidden rounded-2xl">
+                <img
+                  src={visual.url}
+                  alt={visual.alt}
+                  width={1024}
+                  height={1024}
+                  className="aspect-[4/3] w-full object-cover"
+                />
+                <figcaption className="border-t border-border/70 px-4 py-3 text-xs text-muted-foreground">
+                  Illustrative scientific visualization — not patient imagery or a clinical finding.
+                </figcaption>
+              </figure>
+            )}
+          </div>
           <div className="mt-8 max-w-3xl">
             <SafetyBanner />
           </div>
