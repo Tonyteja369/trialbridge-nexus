@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GenomicsRouteImport } from './routes/genomics'
 import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SecurityRouteImport } from './routes/security'
@@ -45,6 +46,11 @@ const AboutRoute = AboutRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenomicsRoute = GenomicsRouteImport.update({
+  id: '/genomics',
+  path: '/genomics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlatformRoute = PlatformRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/genomics': typeof GenomicsRoute
   '/platform': typeof PlatformRoute
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/genomics': typeof GenomicsRoute
   '/platform': typeof PlatformRoute
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/genomics': typeof GenomicsRoute
   '/platform': typeof PlatformRoute
   '/research': typeof ResearchRoute
   '/security': typeof SecurityRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/genomics'
     | '/platform'
     | '/research'
     | '/security'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/genomics'
     | '/platform'
     | '/research'
     | '/security'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/genomics'
     | '/platform'
     | '/research'
     | '/security'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  GenomicsRoute: typeof GenomicsRoute
   PlatformRoute: typeof PlatformRoute
   ResearchRoute: typeof ResearchRoute
   SecurityRoute: typeof SecurityRoute
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/genomics': {
+      id: '/genomics'
+      path: '/genomics'
+      fullPath: '/genomics'
+      preLoaderRoute: typeof GenomicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/platform': {
@@ -418,6 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  GenomicsRoute: GenomicsRoute,
   PlatformRoute: PlatformRoute,
   ResearchRoute: ResearchRoute,
   SecurityRoute: SecurityRoute,
