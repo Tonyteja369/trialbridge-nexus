@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-secondary/40 px-4 py-6 md:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-primary/15 bg-secondary/55 px-4 py-6 backdrop-blur-xl md:flex">
         <Link to="/dashboard" className="px-1">
           <Wordmark />
         </Link>
@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-3 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
+        <div className="sticky top-0 z-20 flex items-center gap-3 overflow-x-auto border-b border-border bg-card/80 px-4 py-2 backdrop-blur-xl md:hidden">
           {nav.map((item) => (
             <Link key={item.to} to={item.to} className="whitespace-nowrap text-sm">
               {item.label}
@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             Sign out
           </button>
         </div>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8">{children}</main>
+        <main className="relative mx-auto w-full max-w-6xl flex-1 px-5 py-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-72 before:bg-[radial-gradient(circle_at_65%_0%,var(--violet-100),transparent_65%)]">{children}</main>
       </div>
     </div>
   );
