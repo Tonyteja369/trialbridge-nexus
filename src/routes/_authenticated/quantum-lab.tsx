@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
+import { GenomicBenchmark } from "@/components/GenomicBenchmark";
 
 export const Route = createFileRoute("/_authenticated/quantum-lab")({
   head: () => ({
@@ -133,6 +134,19 @@ function QuantumLab() {
         </p>
       </section>
 
+
+      <section aria-labelledby="genomic-benchmark">
+        <h2 id="genomic-benchmark" className="text-base font-semibold">
+          Classical vs quantum genomic analysis
+        </h2>
+        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+          Real cardiovascular variant records from ClinVar and the GWAS Catalog, run through two
+          clearly separated optimisation pipelines with a researcher review step.
+        </p>
+        <div className="mt-4">
+          <GenomicBenchmark />
+        </div>
+      </section>
 
       <section aria-labelledby="runs">
         <h2 id="runs" className="text-base font-semibold">
