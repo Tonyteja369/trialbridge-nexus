@@ -166,7 +166,7 @@ function Landing() {
           >
             <source src="/__l5e/assets-v1/9095d4a7-61aa-4ef3-ab96-0be21168a30c/clinqspherex-biomedical-background.mp4" type="video/mp4" />
           </video>
-          <div className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-6xl items-center gap-10 px-5 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
+          <div className="hero-environment-inner mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
             <div className="relative z-10">
               <p className="text-sm font-semibold uppercase text-hero-accent">
                 Clinical research intelligence
