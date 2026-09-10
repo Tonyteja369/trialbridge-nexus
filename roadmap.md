@@ -12,6 +12,7 @@
 - [ ] Show SOURCE OFFLINE without rendering retained or substitute records after failures
 - [ ] Export the current measured NCBI run as JSON or CSV with IDs and retrieval timestamps
 - [ ] Pause the authentication video for reduced motion and low-power/data-saving conditions, with poster fallback
+- [ ] Require authentication before every site page, including Genomics and all research content
 
 ## Now — premium biomedical liquid interface
 - [x] Cinematic violet/white landing experience with strategic liquid-glass surfaces
