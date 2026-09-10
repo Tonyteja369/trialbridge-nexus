@@ -1,5 +1,4 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { PublicFooter, PublicNav } from "@/components/PublicNav";
 import { SafetyBanner } from "@/components/SafetyBanner";
 import { TrialSearch } from "@/components/TrialSearch";
 import { OutcomeBadge } from "@/components/OutcomeBadge";
@@ -7,7 +6,7 @@ import { ProvenanceTag } from "@/components/DataProvenance";
 import { getDisease, diseases } from "@/lib/diseases";
 import { diseaseVisual } from "@/lib/disease-visuals";
 
-export const Route = createFileRoute("/_protected/diseases/$slug")({
+export const Route = createFileRoute("/_authenticated/diseases/$slug")({
   loader: ({ params }) => {
     const disease = getDisease(params.slug);
     if (!disease) throw notFound();
@@ -44,7 +43,6 @@ function DiseasePage() {
 
   return (
     <>
-      <PublicNav />
       <main className="min-h-screen bg-background">
         <section className="mx-auto max-w-6xl px-5 pb-10 pt-14">
           <Link to="/diseases" className="text-sm text-muted-foreground hover:text-foreground">
@@ -226,7 +224,6 @@ function DiseasePage() {
           </ul>
         </section>
       </main>
-      <PublicFooter />
     </>
   );
 }

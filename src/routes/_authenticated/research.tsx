@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PublicFooter, PublicNav } from "@/components/PublicNav";
 
-export const Route = createFileRoute("/_protected/research")({
+export const Route = createFileRoute("/_authenticated/research")({
   head: () => ({
     meta: [
       { title: "Research — ClinQSphereX" },
@@ -57,7 +56,6 @@ const sections: [string, string][] = [
 function ResearchPage() {
   return (
     <>
-      <PublicNav />
       <main className="mx-auto max-w-4xl px-5 py-14">
         <h1 className="font-display text-3xl font-semibold">Research</h1>
 
@@ -95,7 +93,6 @@ function ResearchPage() {
           </p>
         </section>
       </main>
-      <PublicFooter />
     </>
   );
 }

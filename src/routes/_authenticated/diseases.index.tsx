@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PublicFooter, PublicNav } from "@/components/PublicNav";
 import { DiseaseExplorer } from "@/components/DiseaseExplorer";
 import { SafetyBanner } from "@/components/SafetyBanner";
 
-export const Route = createFileRoute("/_protected/diseases/")({
+export const Route = createFileRoute("/_authenticated/diseases/")({
   head: () => ({
     meta: [
       { title: "Research by Disease Area — ClinQSphereX" },
@@ -28,7 +27,6 @@ export const Route = createFileRoute("/_protected/diseases/")({
 function DiseasesIndex() {
   return (
     <>
-      <PublicNav />
       <main className="min-h-screen bg-background">
         <section className="mx-auto max-w-6xl px-5 py-16">
           <h1 className="font-display text-3xl font-semibold">Explore research by disease</h1>
@@ -46,7 +44,6 @@ function DiseasesIndex() {
           </div>
         </section>
       </main>
-      <PublicFooter />
     </>
   );
 }

@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
-import { DiseaseExplorer } from "@/components/DiseaseExplorer";
 
 export const Route = createFileRoute("/_authenticated/quantum-lab")({
   head: () => ({
@@ -134,18 +133,6 @@ function QuantumLab() {
         </p>
       </section>
 
-      <section aria-labelledby="disease-areas">
-        <h2 id="disease-areas" className="text-base font-semibold">
-          Disease areas
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          Research areas the experimental models are studied against. Registry trials are searched
-          live; research data shown elsewhere is synthetic.
-        </p>
-        <div className="mt-4">
-          <DiseaseExplorer />
-        </div>
-      </section>
 
       <section aria-labelledby="runs">
         <h2 id="runs" className="text-base font-semibold">
