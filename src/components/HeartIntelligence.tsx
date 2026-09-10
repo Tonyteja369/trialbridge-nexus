@@ -1,4 +1,4 @@
-import heartImage from "@/assets/cardiovascular-heart.jpg";
+import heartImage from "@/assets/cardiovascular-heart.jpg.asset.json";
 import { Activity, ClipboardCheck, Database, FlaskConical } from "lucide-react";
 
 const signals = [
@@ -13,7 +13,7 @@ export function HeartIntelligence() {
     <div className="heart-stage">
       <div className="heart-orbit" aria-hidden />
       <img
-        src={heartImage}
+        src={heartImage.url}
         alt="Scientifically inspired non-graphic anatomical heart visualization"
         width={1536}
         height={1536}
