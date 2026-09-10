@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, LoadingState } from "@/components/DataState";
 import { GenomicBenchmark } from "@/components/GenomicBenchmark";
+import { HeartBenchmark } from "@/components/HeartBenchmark";
+
 
 export const Route = createFileRoute("/_authenticated/quantum-lab")({
   head: () => ({
