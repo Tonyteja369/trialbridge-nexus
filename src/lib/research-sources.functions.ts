@@ -1,19 +1,47 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
  * Live, read-only access to public research APIs.
- * Nothing is cached, stored or synthesised: if a source is unreachable the UI
- * shows SOURCE OFFLINE rather than substituting invented records.
+ * Successful responses are cached briefly per source/query. Failed requests
+ * never populate the cache, and expired values are never served as fallback.
  */
 
 const EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
 
-async function getJson(url: string | URL, timeoutMs = 15000): Promise<any> {
-  const res = await fetch(url, {
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(timeoutMs),
-  });
-  if (!res.ok) throw new Error(`Source returned HTTP ${res.status}`);
+type CacheEntry<T> = { value: T; expiresAt: number };
+const responseCache = new Map<string, CacheEntry<unknown>>();
+const CACHE_TTL_MS = 5 * 60_000;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function retryFetch(url: string | URL, timeoutMs: number, accept: string, source: string) {
+  let lastError = "request failed";
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const res = await fetch(url, { headers: { accept }, signal: AbortSignal.timeout(timeoutMs) });
+      if (res.ok) return res;
+      lastError = `HTTP ${res.status}`;
+      if (res.status < 500 && res.status !== 429) break;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : "request failed";
+    }
+    if (attempt < 3) await wait(200 * 2 ** (attempt - 1));
+  }
+  throw new Error(`${source} unavailable after 3 attempts (${lastError})`);
+}
+
+async function cached<T>(key: string, load: () => Promise<T>, ttlMs = CACHE_TTL_MS): Promise<T> {
+  const entry = responseCache.get(key) as CacheEntry<T> | undefined;
+  if (entry && entry.expiresAt > Date.now()) return entry.value;
+  if (entry) responseCache.delete(key);
+  const value = await load();
+  responseCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+  return value;
+}
+
+async function getJson(url: string | URL, source: string, timeoutMs = 15000): Promise<any> {
+  const res = await retryFetch(url, timeoutMs, "application/json", source);
   return res.json();
 }
 
@@ -37,6 +65,7 @@ export type PubMedResult = {
 };
 
 export const searchPubMed = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { term: string; pageSize?: number }) => {
     const term = (input?.term ?? "").trim();
     if (!term) throw new Error("A search term is required");
@@ -51,7 +80,9 @@ export const searchPubMed = createServerFn({ method: "GET" })
     search.searchParams.set("retmax", String(data.pageSize));
     search.searchParams.set("sort", "date");
     search.searchParams.set("retmode", "json");
-    const s = await getJson(search);
+    const key = `pubmed:${data.term.toLowerCase()}:${data.pageSize}`;
+    return cached(key, async () => {
+    const s = await getJson(search, "PubMed");
     const ids: string[] = s?.esearchresult?.idlist ?? [];
     const totalRaw = Number(s?.esearchresult?.count);
     const totalCount = Number.isFinite(totalRaw) ? totalRaw : null;
@@ -62,7 +93,7 @@ export const searchPubMed = createServerFn({ method: "GET" })
       summary.searchParams.set("db", "pubmed");
       summary.searchParams.set("id", ids.join(","));
       summary.searchParams.set("retmode", "json");
-      const sum = await getJson(summary);
+      const sum = await getJson(summary, "PubMed");
       publications = ids
         .map((id) => sum?.result?.[id])
         .filter(Boolean)
@@ -83,6 +114,7 @@ export const searchPubMed = createServerFn({ method: "GET" })
       elapsedMs: Date.now() - started,
       publications,
     };
+    });
   });
 
 /* ----------------------------------------------------------------- UniProt */
@@ -105,6 +137,7 @@ export type UniProtResult = {
 };
 
 export const searchUniProt = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { term: string; pageSize?: number }) => {
     const term = (input?.term ?? "").trim();
     if (!term) throw new Error("A search term is required");
@@ -112,6 +145,8 @@ export const searchUniProt = createServerFn({ method: "GET" })
     return { term, pageSize: Math.min(Math.max(input?.pageSize ?? 6, 1), 15) };
   })
   .handler(async ({ data }): Promise<UniProtResult> => {
+    const key = `uniprot:${data.term.toLowerCase()}:${data.pageSize}`;
+    return cached(key, async () => {
     const started = Date.now();
     const url = new URL("https://rest.uniprot.org/uniprotkb/search");
     url.searchParams.set("query", `${data.term} AND reviewed:true`);
@@ -121,7 +156,7 @@ export const searchUniProt = createServerFn({ method: "GET" })
       "accession,protein_name,organism_name,length,cc_function,protein_existence",
     );
     url.searchParams.set("format", "json");
-    const json = await getJson(url);
+    const json = await getJson(url, "UniProt");
 
     const proteins: ProteinRecord[] = (json?.results ?? []).map((r: any) => {
       const fn = (r.comments ?? []).find((c: any) => c.commentType === "FUNCTION");
@@ -146,6 +181,7 @@ export const searchUniProt = createServerFn({ method: "GET" })
       elapsedMs: Date.now() - started,
       proteins,
     };
+    });
   });
 
 /* --------------------------------------------- NCBI nucleotide ingest run */
@@ -183,6 +219,7 @@ export type IngestRun = {
 const BASE_CAP = 400;
 
 export const runSequenceIngest = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { term: string; records?: number }) => {
     const term = (input?.term ?? "").trim();
     if (!term) throw new Error("A research term is required");
@@ -192,13 +229,15 @@ export const runSequenceIngest = createServerFn({ method: "GET" })
     return { term, records };
   })
   .handler(async ({ data }): Promise<IngestRun> => {
+    const key = `ncbi-nuccore:${data.term.toLowerCase()}:${data.records}`;
+    return cached(key, async () => {
     const t0 = Date.now();
     const search = new URL(`${EUTILS}/esearch.fcgi`);
     search.searchParams.set("db", "nuccore");
     search.searchParams.set("term", data.term);
     search.searchParams.set("retmax", String(data.records));
     search.searchParams.set("retmode", "json");
-    const s = await getJson(search, 20000);
+    const s = await getJson(search, "NCBI Nucleotide", 20000);
     const ids: string[] = s?.esearchresult?.idlist ?? [];
     const totalRaw = Number(s?.esearchresult?.count);
     const searchMs = Date.now() - t0;
@@ -216,8 +255,7 @@ export const runSequenceIngest = createServerFn({ method: "GET" })
       fetchUrl.searchParams.set("retmode", "text");
       fetchUrl.searchParams.set("seq_start", "1");
       fetchUrl.searchParams.set("seq_stop", String(BASE_CAP));
-      const res = await fetch(fetchUrl, { signal: AbortSignal.timeout(30000) });
-      if (!res.ok) throw new Error(`NCBI efetch returned HTTP ${res.status}`);
+       const res = await retryFetch(fetchUrl, 30000, "text/plain", "NCBI Nucleotide");
       const text = await res.text();
       bytesReceived += new TextEncoder().encode(text).length;
       fasta += text;
@@ -282,6 +320,7 @@ export const runSequenceIngest = createServerFn({ method: "GET" })
       retrievedAt: new Date().toISOString(),
       excerpts,
     };
+    });
   });
 
 /* ------------------------------------------------------------ Source panel */
@@ -300,8 +339,10 @@ async function probe(name: string, url: string, note: string, siteUrl: string): 
   const started = Date.now();
   const checkedAt = new Date().toISOString();
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    if (!res.ok) throw new Error(String(res.status));
+    await cached(`probe:${name}`, async () => {
+      await retryFetch(url, 10000, "application/json,text/plain", name);
+      return true;
+    }, 60_000);
     return {
       name,
       kind: "live",
@@ -324,7 +365,7 @@ async function probe(name: string, url: string, note: string, siteUrl: string): 
   }
 }
 
-export const checkResearchSources = createServerFn({ method: "GET" }).handler(
+export const checkResearchSources = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(
   async (): Promise<{ checkedAt: string; sources: SourceStatus[] }> => {
     const checkedAt = new Date().toISOString();
     const live = await Promise.all([

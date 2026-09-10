@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
  * Public trial discovery against ClinicalTrials.gov API v2.
@@ -37,6 +38,7 @@ const FIELDS = [
 ].join(",");
 
 export const searchTrials = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { condition: string; status?: string; pageSize?: number }) => {
     const condition = (input?.condition ?? "").trim();
     if (!condition) throw new Error("A condition is required");
