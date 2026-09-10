@@ -6,8 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { recordConsent, reviewCandidate } from "@/lib/trialbridge.functions";
 import { StatusPill } from "@/components/StatusPill";
 import { SafetyBanner } from "@/components/SafetyBanner";
-import { Check, HelpCircle, X } from "lucide-react";
 import { toast } from "sonner";
+import { OutcomeBadge } from "@/components/OutcomeBadge";
+import { ErrorState, LoadingState } from "@/components/DataState";
 
 export const Route = createFileRoute("/_authenticated/candidates/$candidateId")({
   head: () => ({
