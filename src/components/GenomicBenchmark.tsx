@@ -37,8 +37,9 @@ function redundancy(a: GenomicFeature, b: GenomicFeature) {
 function objective(features: GenomicFeature[], set: number[], R: number[][]) {
   let score = 0;
   for (let i = 0; i < set.length; i += 1) {
-    score += features[set[i]]!.weight;
-    for (let j = i + 1; j < set.length; j += 1) score -= LAMBDA * R[set[i]!]![set[j]!]!;
+    const a = set[i]!;
+    score += features[a]!.weight;
+    for (let j = i + 1; j < set.length; j += 1) score -= LAMBDA * R[a]![set[j]!]!;
   }
   return score;
 }
