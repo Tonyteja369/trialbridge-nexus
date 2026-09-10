@@ -5,6 +5,8 @@ import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/Wordmark";
 import { BiomedicalVideo } from "@/components/BiomedicalVideo";
+import { GlassPanel } from "@/components/ui/glass-panel";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -98,7 +100,7 @@ function AuthPage() {
             Continue to study operations, candidate screening, consent, experiments and audited actions.
           </p>
         </div>
-        <div className="glass-dark w-full p-7 sm:p-9">
+        <GlassPanel variant="dark" className="w-full p-7 sm:p-9">
         <Link to="/" className="text-hero-foreground">
           <Wordmark />
         </Link>
@@ -150,31 +152,33 @@ function AuthPage() {
               className="mt-1 w-full rounded-md border border-hero-accent/25 bg-hero/60 px-3 py-2.5 text-sm text-hero-foreground outline-none transition-shadow focus:ring-2 focus:ring-hero-accent"
             />
           </div>
-          <button
+          <Button
             type="submit"
             disabled={busy}
-            className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="h-10 w-full"
           >
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
-          </button>
+          </Button>
         </form>
 
-        <button
+        <Button
+          variant="outline"
           onClick={google}
-          className="mt-3 w-full rounded-md border border-hero-accent/25 px-4 py-2.5 text-sm font-medium text-hero-foreground transition-colors hover:bg-hero-foreground/10"
+          className="mt-3 h-10 w-full border-hero-accent/25 bg-hero/35 text-hero-foreground hover:bg-hero-foreground/10 hover:text-hero-foreground"
         >
           Continue with Google
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 w-full text-sm text-hero-muted underline-offset-4 hover:text-hero-foreground hover:underline"
+          className="mt-6 w-full text-hero-muted hover:bg-hero-foreground/5 hover:text-hero-foreground"
         >
           {mode === "signin"
             ? "No account yet? Create one"
             : "Already have an account? Sign in"}
-        </button>
-        </div>
+        </Button>
+        </GlassPanel>
       </div>
     </main>
   );
