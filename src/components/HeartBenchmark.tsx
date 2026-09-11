@@ -24,8 +24,8 @@ const STEPS = [
   "Features preprocessed",
   "Identical split created",
   "Classical baseline trained",
-  "Quantum kernel built",
-  "Quantum classifier trained",
+  "Quantum configurations swept",
+  "Best configuration selected",
   "Evaluation complete",
 ];
 
@@ -48,7 +48,8 @@ export function HeartBenchmark() {
   const [status, setStatus] = useState<"ready" | "running" | "completed" | "failed">("ready");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-
+  const [kernelId, setKernelId] = useState<string | null>(null);
+  const [showTrace, setShowTrace] = useState(false);
 
   // Latest stored experiment, so a reload still shows real measured values.
   const stored = useQuery({
@@ -69,22 +70,25 @@ export function HeartBenchmark() {
 
   useEffect(() => {
     // Older stored runs predate the configuration sweep; ignore them.
-    if (!result && stored.data?.quantum_experiments?.length && status === "ready")
-      setResult(stored.data);
+    if (!result && stored.data?.kernel_previews?.length && status === "ready") setResult(stored.data);
   }, [stored.data, result, status]);
-
 
   useEffect(() => {
     if (status !== "running") return;
-    const t = setInterval(() => setProgress((p) => Math.min(STEPS.length - 1, p + 1)), 550);
+    const t = setInterval(() => setProgress((p) => Math.min(STEPS.length - 1, p + 1)), 700);
     return () => clearInterval(t);
   }, [status]);
+
+  useEffect(() => {
+    if (result && !kernelId) setKernelId(result.best_quantum.kernel_id);
+  }, [result, kernelId]);
 
   async function execute() {
     setStatus("running");
     setError(null);
     setProgress(0);
     setResult(null);
+    setKernelId(null);
     try {
       const res = await run({ data: { testSize: 0.2, seed: 42 } });
       setResult(res);
@@ -113,6 +117,8 @@ export function HeartBenchmark() {
     () =>
       result
         ? [
+            { stage: "Data preparation", ms: result.timings.data_preparation_ms },
+            { stage: "Preprocessing", ms: result.timings.preprocessing_ms },
             { stage: "Classical training", ms: result.classical.training_time_ms },
             { stage: "Quantum kernel", ms: result.quantum.kernel_time_ms },
             { stage: "Quantum training", ms: result.quantum.training_time_ms },
@@ -137,6 +143,10 @@ export function HeartBenchmark() {
       Quantum: at(result.quantum.roc_curve, x),
     }));
   }, [result]);
+
+  const preview = result
+    ? (result.kernel_previews.find((p) => p.kernel_id === kernelId) ?? result.kernel_previews[0]!)
+    : null;
 
   const rows: { label: string; c: string; q: string; diff: string }[] = result
     ? [
@@ -207,32 +217,16 @@ export function HeartBenchmark() {
         "Total runtime",
       ].map((label) => ({ label, c: "Not evaluated", q: "Not evaluated", diff: "—" }));
 
-  const best = result
-    ? {
-        accuracy:
-          result.quantum.accuracy >= result.classical.accuracy
-            ? { name: "Quantum kernel SVM", value: n3(result.quantum.accuracy) }
-            : { name: "Logistic regression", value: n3(result.classical.accuracy) },
-        auc:
-          result.quantum.roc_auc >= result.classical.roc_auc
-            ? { name: "Quantum kernel SVM", value: n3(result.quantum.roc_auc) }
-            : { name: "Logistic regression", value: n3(result.classical.roc_auc) },
-        runtime:
-          result.quantum.total_time_ms <= result.classical.total_time_ms
-            ? { name: "Quantum kernel SVM", value: ms(result.quantum.total_time_ms) }
-            : { name: "Logistic regression", value: ms(result.classical.total_time_ms) },
-      }
-    : null;
-
   return (
     <div className="space-y-6">
       <GlassPanel className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold">Heart Disease Model Benchmark</h3>
+            <h3 className="text-lg font-semibold">Heart Disease Benchmark Laboratory</h3>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Real public research data · classical baseline vs experimental quantum kernel. Every
-              value below is measured during the run; nothing is precomputed or assumed.
+              Real public research data · classical baseline vs a searched quantum-kernel
+              configuration space. Every value below is measured during the run; nothing is
+              precomputed or assumed.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -243,7 +237,7 @@ export function HeartBenchmark() {
               {status}
             </span>
             <Button onClick={execute} disabled={status === "running"}>
-              {status === "running" ? "Running benchmark…" : "Run benchmark"}
+              {status === "running" ? "Running sweep…" : "Run benchmark"}
             </Button>
           </div>
         </div>
@@ -252,15 +246,25 @@ export function HeartBenchmark() {
           <Config label="Dataset" value="UCI Heart Disease" />
           <Config
             label="Records"
-            value={result ? `${result.dataset.records_used} of ${result.dataset.records}` : "Loaded at run time"}
+            value={
+              result ? `${result.dataset.records_used} of ${result.dataset.records}` : "Loaded at run time"
+            }
           />
-          <Config label="Configuration sweep" value="2–5 qubits · 1–2 repetitions" />
+          <Config
+            label="Configuration sweep"
+            value={
+              result
+                ? `${result.quantum_experiments.length} configurations`
+                : "2–5 qubits · 1–3 reps · 2 feature maps · 3 C values"
+            }
+          />
           <Config label="Train / test split" value="80 / 20" />
           <Config label="Random seed" value="42" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Every configuration is built, trained and evaluated on the identical split; the reported
-          best configuration is chosen from measured test accuracy, never set by hand.
+          The reported configuration is chosen on an inner validation split carved from the training
+          rows only — the test set is never used to select a configuration, and no metric is set by
+          hand.
         </p>
 
         <div className="mt-4 rounded-md border border-border bg-secondary p-3 text-sm">
@@ -273,6 +277,7 @@ export function HeartBenchmark() {
               "Same seed",
               "Same test set",
               "Same evaluation protocol",
+              "No test-label tuning",
             ].map((t) => (
               <span key={t} className="rounded-full border border-border px-2.5 py-0.5 text-xs">
                 {t}
@@ -280,7 +285,6 @@ export function HeartBenchmark() {
             ))}
           </span>
         </div>
-
 
         <ol className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
           {STEPS.map((s, i) => {
@@ -303,14 +307,16 @@ export function HeartBenchmark() {
       </GlassPanel>
 
       <GlassPanel className="overflow-x-auto p-5">
-        <h4 className="text-base font-semibold">Classical baseline vs quantum kernel</h4>
+        <h4 className="text-base font-semibold">
+          Classical baseline vs best quantum configuration
+        </h4>
         <table className="mt-4 w-full min-w-[38rem] text-sm">
           <caption className="sr-only">Measured comparison of the two pipelines</caption>
           <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th scope="col" className="px-4 py-2.5">Metric</th>
               <th scope="col" className="px-4 py-2.5">Classical baseline</th>
-              <th scope="col" className="px-4 py-2.5">Quantum kernel</th>
+              <th scope="col" className="px-4 py-2.5">Best quantum configuration</th>
               <th scope="col" className="px-4 py-2.5">Difference</th>
             </tr>
           </thead>
@@ -343,7 +349,7 @@ export function HeartBenchmark() {
       {result ? (
         <>
           <GlassPanel className="p-5">
-            <h4 className="text-base font-semibold">Best measured quantum configuration</h4>
+            <h4 className="text-base font-semibold">Best quantum configuration</h4>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Summary
                 title="Best quantum accuracy"
@@ -361,37 +367,70 @@ export function HeartBenchmark() {
                 name="Best quantum minus classical"
               />
               <Summary
-                title="Best configuration"
+                title="Configuration"
                 value={`${result.best_quantum.qubits} qubits`}
-                name={`ZZ-style feature map · ${result.best_quantum.reps} repetition${result.best_quantum.reps === 1 ? "" : "s"}`}
+                name={`${result.best_quantum.feature_map_type === "zz" ? "ZZ-style Pauli map" : "Z-only product map"} · ${result.best_quantum.reps} repetition${result.best_quantum.reps === 1 ? "" : "s"} · C=${result.best_quantum.svm_c}`}
               />
             </div>
+
+            <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-5">
+              <Item k="Precision" v={pct(result.best_quantum.precision)} />
+              <Item k="Recall" v={pct(result.best_quantum.recall)} />
+              <Item k="F1" v={pct(result.best_quantum.f1)} />
+              <Item k="ROC-AUC" v={pct(result.best_quantum.roc_auc)} />
+              <Item k="Validation accuracy" v={pct(result.best_quantum.validation_accuracy)} />
+            </dl>
+
+            <div className="mt-5 space-y-3">
+              <AccuracyBar label="Classical accuracy" value={result.classical.accuracy} tone="primary" />
+              <AccuracyBar
+                label="Best quantum accuracy"
+                value={result.best_quantum.accuracy}
+                tone={result.quantum_exceeds_classical ? "success" : "muted"}
+              />
+            </div>
+
             <p className="mt-4 text-sm">
               {result.quantum_exceeds_classical
-                ? `The best measured quantum-kernel configuration achieved higher test accuracy than the classical baseline on this benchmark (${pct(result.best_quantum.accuracy)} vs ${pct(result.classical.accuracy)}). Quantum performance is configuration- and dataset-dependent; this is not a general quantum-advantage result.`
-                : `Best measured quantum configuration did not exceed the classical baseline in this experiment (${pct(result.best_quantum.accuracy)} vs ${pct(result.classical.accuracy)}).`}
+                ? `Under the evaluated experimental configuration, the best quantum-kernel model achieved higher test accuracy than the classical logistic-regression baseline (${pct(result.best_quantum.accuracy)} vs ${pct(result.classical.accuracy)}, +${Math.abs(result.accuracy_difference_pp).toFixed(1)} percentage points). Performance is configuration- and dataset-dependent; this is not a general quantum-advantage result.`
+                : `Under the evaluated configurations, the classical baseline achieved higher or equal test accuracy (${pct(result.classical.accuracy)} vs ${pct(result.best_quantum.accuracy)}). Best measured quantum configuration did not exceed the classical baseline. The quantum result remains an experimental benchmark.`}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              The configuration is chosen from held-out test accuracy across the sweep, so the best
-              value is optimistic relative to a fully held-out protocol. Full sweep runtime{" "}
-              {ms(result.sweep_runtime_ms)} across {result.quantum_experiments.length}{" "}
-              configurations.
+              Selection rule: {result.evaluation_protocol.selection_rule} Highest test accuracy
+              observed anywhere in the sweep was {pct(result.best_quantum_by_test.accuracy)} (
+              {result.best_quantum_by_test.label}); it is shown for transparency only and was not
+              used for selection. Full sweep runtime {ms(result.sweep_runtime_ms)} across{" "}
+              {result.quantum_experiments.length} configurations.
             </p>
           </GlassPanel>
 
           <GlassPanel className="overflow-x-auto p-5">
             <h4 className="text-base font-semibold">Quantum configuration sweep</h4>
-            <table className="mt-4 w-full min-w-[46rem] text-sm">
+            <table className="mt-4 w-full min-w-[62rem] text-sm">
               <caption className="sr-only">Measured metrics for every quantum configuration</caption>
               <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  {["Configuration", "Qubits", "Reps", "Accuracy", "Precision", "Recall", "F1", "ROC-AUC", "Runtime"].map(
-                    (h) => (
-                      <th key={h} scope="col" className="px-3 py-2.5">
-                        {h}
-                      </th>
-                    ),
-                  )}
+                  {[
+                    "Configuration",
+                    "Qubits",
+                    "Reps",
+                    "Map",
+                    "C",
+                    "Features",
+                    "Val acc",
+                    "Accuracy",
+                    "Precision",
+                    "Recall",
+                    "F1",
+                    "ROC-AUC",
+                    "Kernel time",
+                    "Train time",
+                    "Inference",
+                  ].map((h) => (
+                    <th key={h} scope="col" className="px-3 py-2.5">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -401,37 +440,70 @@ export function HeartBenchmark() {
                     <tr key={e.label} className={isBest ? "bg-secondary font-medium" : undefined}>
                       <th scope="row" className="px-3 py-2.5 text-left font-medium">
                         {e.label}
-                        {isBest ? " · best" : ""}
+                        {isBest ? " · selected" : ""}
                       </th>
                       <td className="px-3 py-2.5 tabular-nums">{e.qubits}</td>
                       <td className="px-3 py-2.5 tabular-nums">{e.reps}</td>
+                      <td className="px-3 py-2.5">{e.feature_map_type.toUpperCase()}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{e.svm_c}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{e.feature_dimensions}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.validation_accuracy)}</td>
                       <td className="px-3 py-2.5 tabular-nums">{n3(e.accuracy)}</td>
                       <td className="px-3 py-2.5 tabular-nums">{n3(e.precision)}</td>
                       <td className="px-3 py-2.5 tabular-nums">{n3(e.recall)}</td>
                       <td className="px-3 py-2.5 tabular-nums">{n3(e.f1)}</td>
                       <td className="px-3 py-2.5 tabular-nums">{n3(e.roc_auc)}</td>
-                      <td className="px-3 py-2.5 tabular-nums">{ms(e.total_time_ms)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{ms(e.kernel_time_ms)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{ms(e.training_time_ms)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{ms(e.inference_time_ms)}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
             <p className="mt-3 text-xs text-muted-foreground">
-              Kernel, training and inference time are measured separately per configuration with a
-              high-resolution timer and reported in microseconds when sub-millisecond.
+              Every row is a completed experiment. Kernel, training and inference time are measured
+              separately with a high-resolution timer and reported in microseconds when
+              sub-millisecond.
             </p>
           </GlassPanel>
 
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <Summary title="Best accuracy" name={best!.accuracy.name} value={best!.accuracy.value} />
-            <Summary title="Best ROC-AUC" name={best!.auc.name} value={best!.auc.value} />
-            <Summary
-              title="Lowest total runtime"
-              name={best!.runtime.name}
-              value={best!.runtime.value}
-            />
-          </div>
+          {preview ? (
+            <GlassPanel className="p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h4 className="text-base font-semibold">Quantum kernel matrices</h4>
+                <label className="text-xs text-muted-foreground">
+                  Configuration{" "}
+                  <select
+                    className="ml-2 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+                    value={preview.kernel_id}
+                    onChange={(e) => setKernelId(e.target.value)}
+                  >
+                    {result.kernel_previews.map((p) => (
+                      <option key={p.kernel_id} value={p.kernel_id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="mt-4 grid gap-6 lg:grid-cols-2">
+                <KernelHeatmap
+                  title={`Training kernel — first ${preview.train_shown} × ${preview.train_shown} of ${preview.train_total} × ${preview.train_total}`}
+                  matrix={preview.train}
+                />
+                <KernelHeatmap
+                  title={`Test vs training kernel — first ${preview.test_shown} × ${preview.train_shown} of ${preview.test_total} × ${preview.train_total}`}
+                  matrix={preview.test}
+                />
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Fidelity values for this configuration range {preview.min} – {preview.max} with mean{" "}
+                {preview.mean}. Darker cells are higher fidelity; hover a cell to read the measured
+                value.
+              </p>
+            </GlassPanel>
+          ) : null}
 
           <div className="grid gap-4 md:grid-cols-3">
             <GlassPanel className="p-5">
@@ -446,23 +518,82 @@ export function HeartBenchmark() {
             <GlassPanel className="p-5 md:col-span-2">
               <h4 className="text-sm font-semibold">Quantum computation</h4>
               <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
-                <Item k="Qubits" v={String(result.configuration.qubits)} />
+                <Item k="Qubits" v={String(result.best_quantum.qubits)} />
                 <Item
                   k="Samples"
                   v={`${result.dataset.train_samples} train / ${result.dataset.test_samples} test`}
                 />
-                <Item k="Feature dimensions" v={String(result.configuration.quantum_features.length)} />
-                <Item k="Kernel matrix" v={result.quantum.kernel_matrix} />
+                <Item k="Feature dimensions" v={String(result.best_quantum.feature_dimensions)} />
+                <Item k="Original features" v={String(result.best_quantum.original_features)} />
+                <Item k="Training kernel" v={result.best_quantum.kernel_train_dim} />
+                <Item k="Test kernel" v={result.best_quantum.kernel_test_dim} />
+                <Item k="Kernel evaluations" v={result.best_quantum.kernel_evaluations.toLocaleString()} />
                 <Item k="Kernel computation" v={ms(result.quantum.kernel_time_ms)} />
                 <Item k="Classifier training" v={ms(result.quantum.training_time_ms)} />
                 <Item k="Inference" v={ms(result.quantum.inference_time_ms)} />
                 <Item k="Support vectors" v={String(result.quantum.support_vectors)} />
-                <Item k="Feature map" v={result.configuration.feature_map} />
+                <Item k="SVM C" v={String(result.best_quantum.svm_c)} />
+                <Item k="Kernel type" v={result.configuration.kernel_type} />
+                <Item k="Feature map" v={result.best_quantum.feature_map} />
+                <Item k="Shots" v={result.configuration.shots} />
               </dl>
               <p className="mt-3 text-xs text-muted-foreground">
-                Encoded features: {result.configuration.quantum_features.join(", ")} ·{" "}
-                {result.configuration.backend}
+                Encoded features: {result.best_quantum.features.join(", ")} ·{" "}
+                {result.best_quantum.encoding} · {result.configuration.backend}
               </p>
+            </GlassPanel>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <GlassPanel className="p-5">
+              <h4 className="text-sm font-semibold">Data & preprocessing parameters</h4>
+              <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                <Item k="Dataset" v={result.dataset.name} />
+                <Item k="Records used" v={`${result.dataset.records_used} of ${result.dataset.records}`} />
+                <Item
+                  k="Train / test"
+                  v={`${result.dataset.train_samples} / ${result.dataset.test_samples}`}
+                />
+                <Item
+                  k="Inner train / validation"
+                  v={`${result.dataset.inner_train_samples} / ${result.dataset.validation_samples}`}
+                />
+                <Item k="Random seed" v={String(result.configuration.random_seed)} />
+                <Item k="Feature scaling" v={result.configuration.scaling} />
+                <Item k="Feature selection" v={result.configuration.feature_selection} />
+                <Item k="Missing values" v={result.dataset.missing_value_handling} />
+                <Item k="Label definition" v={result.dataset.label_definition} />
+                <Item
+                  k="Positive rate"
+                  v={`${pct(result.dataset.positive_rate_train)} train · ${pct(result.dataset.positive_rate_test)} test`}
+                />
+              </dl>
+            </GlassPanel>
+
+            <GlassPanel className="p-5">
+              <h4 className="text-sm font-semibold">Evaluation protocol</h4>
+              <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                <Item k="Positive class" v={result.evaluation_protocol.positive_class} />
+                <Item k="Averaging" v={result.evaluation_protocol.averaging} />
+                <Item k="Zero division" v={result.evaluation_protocol.zero_division} />
+                <Item k="Classical scores" v={result.evaluation_protocol.classical_score_source} />
+                <Item k="Quantum scores" v={result.evaluation_protocol.quantum_score_source} />
+                <Item
+                  k="Thresholds"
+                  v={`classical ${result.evaluation_protocol.classical_threshold} · quantum ${result.evaluation_protocol.quantum_threshold}`}
+                />
+                <Item k="Evaluation set" v={result.evaluation_protocol.evaluation_set} />
+                <Item k="Selection rule" v={result.evaluation_protocol.selection_rule} />
+              </dl>
+              <h5 className="mt-4 text-sm font-semibold">Measured stage timings</h5>
+              <dl className="mt-2 grid gap-3 text-sm sm:grid-cols-2">
+                <Item k="Data preparation" v={ms(result.timings.data_preparation_ms)} />
+                <Item k="Preprocessing" v={ms(result.timings.preprocessing_ms)} />
+                <Item k="Classical training" v={ms(result.timings.classical_training_ms)} />
+                <Item k="Classical inference" v={ms(result.timings.classical_inference_ms)} />
+                <Item k="Quantum total" v={ms(result.timings.quantum_total_ms)} />
+                <Item k="Benchmark total" v={ms(result.timings.benchmark_total_ms)} />
+              </dl>
             </GlassPanel>
           </div>
 
@@ -521,36 +652,95 @@ export function HeartBenchmark() {
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
                 ROC-AUC — classical {n3(result.classical.roc_auc)} · quantum{" "}
-                {n3(result.quantum.roc_auc)}
+                {n3(result.quantum.roc_auc)}, both computed from continuous scores, not hard labels.
               </p>
             </GlassPanel>
 
             <GlassPanel className="p-5">
               <h4 className="text-sm font-semibold">Confusion matrices (test set)</h4>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Confusion title="Classical" m={result.classical.confusion} />
-                <Confusion title="Quantum" m={result.quantum.confusion} />
+                <Confusion title="Classical baseline" m={result.classical.confusion} />
+                <Confusion title="Best quantum configuration" m={result.quantum.confusion} />
               </div>
             </GlassPanel>
           </div>
 
           <GlassPanel className="p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h4 className="text-sm font-semibold">Per-sample prediction trace</h4>
+              <Button variant="outline" size="sm" onClick={() => setShowTrace((v) => !v)}>
+                {showTrace ? "Hide trace" : `Show ${result.prediction_trace.length} test predictions`}
+              </Button>
+            </div>
+            {showTrace ? (
+              <div className="mt-4 max-h-96 overflow-auto">
+                <table className="w-full min-w-[40rem] text-sm">
+                  <caption className="sr-only">De-identified per-sample test predictions</caption>
+                  <thead className="sticky top-0 bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      {["Sample", "True", "Classical", "Score", "Quantum", "Score", "Agreement"].map(
+                        (h) => (
+                          <th key={h} scope="col" className="px-3 py-2">
+                            {h}
+                          </th>
+                        ),
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {result.prediction_trace.map((t) => (
+                      <tr key={t.id}>
+                        <th scope="row" className="px-3 py-2 text-left font-medium">
+                          {t.id}
+                        </th>
+                        <td className="px-3 py-2 tabular-nums">{t.true_label}</td>
+                        <td className="px-3 py-2 tabular-nums">
+                          {t.classical_prediction} {t.classical_correct ? "✓" : "✗"}
+                        </td>
+                        <td className="px-3 py-2 tabular-nums">{t.classical_score.toFixed(3)}</td>
+                        <td className="px-3 py-2 tabular-nums">
+                          {t.quantum_prediction} {t.quantum_correct ? "✓" : "✗"}
+                        </td>
+                        <td className="px-3 py-2 tabular-nums">{t.quantum_score.toFixed(3)}</td>
+                        <td className="px-3 py-2 text-muted-foreground">
+                          {t.classical_prediction === t.quantum_prediction ? "agree" : "differ"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground">
+                De-identified test identifiers only — no patient-level information from the source
+                records is exposed. Confusion-matrix counts are derived from exactly these rows.
+              </p>
+            )}
+          </GlassPanel>
+
+          <GlassPanel className="p-5">
             <h4 className="text-sm font-semibold">Research interpretation</h4>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               On {result.dataset.test_samples} held-out records from the UCI Heart Disease dataset,
-              the quantum kernel SVM reached a ROC-AUC of {n3(result.quantum.roc_auc)} compared with{" "}
-              {n3(result.classical.roc_auc)} for the classical logistic-regression baseline
-              (accuracy {n3(result.quantum.accuracy)} vs {n3(result.classical.accuracy)}). The
-              quantum pipeline required{" "}
+              the selected quantum-kernel configuration reached a ROC-AUC of{" "}
+              {n3(result.quantum.roc_auc)} compared with {n3(result.classical.roc_auc)} for the
+              classical logistic-regression baseline (accuracy {n3(result.quantum.accuracy)} vs{" "}
+              {n3(result.classical.accuracy)}). The quantum pipeline required{" "}
               {result.comparison.total_time_ratio.toFixed(2)}× the total runtime of the classical
               pipeline in this run, of which {ms(result.quantum.kernel_time_ms)} was kernel
               construction.
             </p>
             <p className="mt-3 text-sm">
-              Benchmark results are environment-dependent and dataset-specific. They do not
-              establish general quantum advantage. The quantum pipeline in this prototype is a full
-              statevector simulation executed on classical hardware, not quantum hardware, and no
-              result here is a clinical or enrolment decision.
+              Experimental quantum-kernel benchmark. Results are environment-dependent and
+              dataset-specific and do not establish general quantum advantage. The quantum pipeline
+              in this prototype is a full statevector simulation executed on classical hardware, not
+              quantum hardware. This is a research prototype: the model is not a diagnosis, it does
+              not autonomously enrol anyone, and every prediction requires researcher review.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Reproduce this experiment: seed {result.reproduction.seed}, test size{" "}
+              {result.reproduction.test_size}, samples {result.reproduction.samples}.{" "}
+              {result.reproduction.note}
             </p>
           </GlassPanel>
         </>
@@ -572,7 +762,7 @@ function Item({ k, v }: { k: string; v: string }) {
   return (
     <div>
       <dt className="text-xs text-muted-foreground">{k}</dt>
-      <dd className="mt-0.5 font-medium tabular-nums">{v}</dd>
+      <dd className="mt-0.5 font-medium">{v}</dd>
     </div>
   );
 }
@@ -596,23 +786,55 @@ function Summary({ title, name, value }: { title: string; name: string; value: s
   );
 }
 
-function Confusion({ title, m }: { title: string; m: { tp: number; fp: number; tn: number; fn: number } }) {
+function AccuracyBar({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "primary" | "success" | "muted";
+}) {
+  const fill =
+    tone === "success" ? "bg-success" : tone === "primary" ? "bg-primary" : "bg-muted-foreground";
   return (
     <div>
-      <p className="text-sm font-medium">{title}</p>
-      <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
-        {[
-          ["True positive", m.tp],
-          ["False positive", m.fp],
-          ["True negative", m.tn],
-          ["False negative", m.fn],
-        ].map(([k, v]) => (
-          <div key={String(k)} className="rounded-md border border-border p-2">
-            <dt className="text-xs text-muted-foreground">{k}</dt>
-            <dd className="mt-0.5 font-semibold tabular-nums">{String(v)}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-semibold tabular-nums">{(value * 100).toFixed(1)}%</span>
+      </div>
+      <div
+        className="mt-1 h-3 w-full overflow-hidden rounded-full bg-muted"
+        role="img"
+        aria-label={`${label} ${(value * 100).toFixed(1)} percent`}
+      >
+        {/* Linear 0–100% scale for both bars — no scale manipulation. */}
+        <div className={`h-full rounded-full ${fill}`} style={{ width: `${value * 100}%` }} />
+      </div>
     </div>
+  );
+}
+
+function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] }) {
+  const cols = matrix[0]?.length ?? 0;
+  return (
+    <figure>
+      <figcaption className="text-xs text-muted-foreground">{title}</figcaption>
+      <div
+        className="mt-2 grid gap-px"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      >
+        {matrix.flatMap((row, i) =>
+          row.map((v, j) => (
+            <div
+              key={`${i}-${j}`}
+              title={`K[${i}, ${j}] = ${v}`}
+              className="aspect-square rounded-[2px]"
+              style={{ backgroundColor: `hsl(var(--primary) / ${Math.min(1, Math.max(0.04, v))})` }}
+            />
+          )),
+        )}
+      </div>
+    </figure>
   );
 }
