@@ -838,3 +838,30 @@ function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] })
     </figure>
   );
 }
+
+function Confusion({
+  title,
+  m,
+}: {
+  title: string;
+  m: { tp: number; fp: number; tn: number; fn: number };
+}) {
+  return (
+    <div>
+      <p className="text-sm font-medium">{title}</p>
+      <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+        {[
+          ["True positive", m.tp],
+          ["False positive", m.fp],
+          ["True negative", m.tn],
+          ["False negative", m.fn],
+        ].map(([k, v]) => (
+          <div key={String(k)} className="rounded-md border border-border p-2">
+            <dt className="text-xs text-muted-foreground">{k}</dt>
+            <dd className="mt-0.5 font-semibold tabular-nums">{String(v)}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
