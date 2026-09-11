@@ -68,8 +68,11 @@ export function HeartBenchmark() {
   });
 
   useEffect(() => {
-    if (!result && stored.data && status === "ready") setResult(stored.data);
+    // Older stored runs predate the configuration sweep; ignore them.
+    if (!result && stored.data?.quantum_experiments?.length && status === "ready")
+      setResult(stored.data);
   }, [stored.data, result, status]);
+
 
   useEffect(() => {
     if (status !== "running") return;
