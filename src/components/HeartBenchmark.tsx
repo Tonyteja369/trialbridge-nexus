@@ -499,8 +499,9 @@ export function HeartBenchmark() {
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
                 Fidelity values for this configuration range {preview.min} – {preview.max} with mean{" "}
-                {preview.mean}. Darker cells are higher fidelity; hover a cell to read the measured
-                value.
+                {preview.mean}. Colour follows the viridis scale shown under each matrix — dark
+                purple is the lowest measured fidelity, yellow the highest. Hover a cell to read the
+                measured value.
               </p>
             </GlassPanel>
           ) : null}
@@ -815,6 +816,30 @@ function AccuracyBar({
   );
 }
 
+// Perceptual sequential colormap (viridis stops), interpolated in sRGB.
+const VIRIDIS: [number, number, number][] = [
+  [68, 1, 84],
+  [72, 40, 120],
+  [62, 74, 137],
+  [49, 104, 142],
+  [38, 130, 142],
+  [31, 158, 137],
+  [53, 183, 121],
+  [109, 205, 89],
+  [180, 222, 44],
+  [253, 231, 37],
+];
+
+function viridis(t: number): string {
+  const x = Math.min(1, Math.max(0, t)) * (VIRIDIS.length - 1);
+  const i = Math.floor(x);
+  const f = x - i;
+  const a = VIRIDIS[i]!;
+  const b = VIRIDIS[Math.min(VIRIDIS.length - 1, i + 1)]!;
+  const c = a.map((v, k) => Math.round(v + (b[k]! - v) * f));
+  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+}
+
 function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] }) {
   const cols = matrix[0]?.length ?? 0;
   if (!cols) {
@@ -825,6 +850,16 @@ function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] })
       </figure>
     );
   }
+
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const row of matrix)
+    for (const v of row) {
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+  const span = hi - lo || 1;
+
   return (
     <figure>
       <figcaption className="text-xs text-muted-foreground">{title}</figcaption>
@@ -833,20 +868,25 @@ function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] })
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {matrix.flatMap((row, i) =>
-          row.map((v, j) => {
-            const pct = Math.round(Math.min(1, Math.max(0.04, v)) * 100);
-            return (
-              <div
-                key={`${i}-${j}`}
-                title={`K[${i}, ${j}] = ${v}`}
-                className="aspect-square min-h-[10px] rounded-[2px] bg-background"
-                style={{
-                  backgroundColor: `color-mix(in oklab, var(--primary) ${pct}%, var(--background))`,
-                }}
-              />
-            );
-          }),
+          row.map((v, j) => (
+            <div
+              key={`${i}-${j}`}
+              title={`K[${i}, ${j}] = ${v}`}
+              className="aspect-square min-h-[10px]"
+              style={{ backgroundColor: viridis((v - lo) / span) }}
+            />
+          )),
         )}
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
+        <span className="tabular-nums">{lo.toFixed(3)}</span>
+        <span
+          className="h-2 flex-1 rounded-full"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${VIRIDIS.map((c) => `rgb(${c[0]}, ${c[1]}, ${c[2]})`).join(", ")})`,
+          }}
+        />
+        <span className="tabular-nums">{hi.toFixed(3)}</span>
       </div>
     </figure>
   );
