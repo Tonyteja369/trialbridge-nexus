@@ -499,8 +499,9 @@ export function HeartBenchmark() {
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
                 Fidelity values for this configuration range {preview.min} – {preview.max} with mean{" "}
-                {preview.mean}. Darker cells are higher fidelity; hover a cell to read the measured
-                value.
+                {preview.mean}. Colour follows the viridis scale shown under each matrix — dark
+                purple is the lowest measured fidelity, yellow the highest. Hover a cell to read the
+                measured value.
               </p>
             </GlassPanel>
           ) : null}
