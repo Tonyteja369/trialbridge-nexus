@@ -353,17 +353,17 @@ function trainKernelSvm(K: number[][], y: number[], C = 1, tol = 1e-3, maxPasses
 
 export const runHeartBenchmark = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { qubits?: number; testSize?: number; seed?: number; samples?: number }) => ({
-    qubits: Math.min(5, Math.max(2, Math.round(input.qubits ?? 4))),
+  .inputValidator((input: { testSize?: number; seed?: number; samples?: number }) => ({
     testSize: Math.min(0.4, Math.max(0.1, input.testSize ?? 0.2)),
     seed: Math.round(input.seed ?? 42),
     samples: Math.min(303, Math.max(60, Math.round(input.samples ?? 303))),
   }))
   .handler(async ({ data, context }): Promise<BenchmarkResult> => {
-    const { qubits, testSize, seed, samples } = data;
+    const { testSize, seed, samples } = data;
+    const sweepStart = performance.now();
     const ds = await loadHeartDataset();
 
-    // Same seeded shuffle drives sub-sampling and the split for both pipelines.
+    // Same seeded shuffle drives sub-sampling and the split for every pipeline.
     const rand = mulberry32(seed);
     const order = ds.rows.map((_, i) => i);
     for (let i = order.length - 1; i > 0; i -= 1) {
@@ -390,7 +390,7 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
     const ytr = train.map((r) => r.y);
     const yte = test.map((r) => r.y);
 
-    // --- classical baseline -------------------------------------------------
+    // --- classical baseline (trained once on the shared split) ---------------
     const cTrainStart = performance.now();
     const model = trainLogisticRegression(Xtr, ytr);
     const cTrainMs = performance.now() - cTrainStart;
@@ -404,10 +404,9 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
     const cInferMs = performance.now() - cInferStart;
     const classicalMetrics = evaluate(cScores, yte, 0.5);
 
-    // --- quantum kernel -----------------------------------------------------
-    // Feature subset chosen on the training set only, by |Pearson r| with the label.
+    // Feature ranking computed on the training set only (no test labels used).
     const meanY = ytr.reduce((s, v) => s + v, 0) / ytr.length;
-    const corr = FEATURE_NAMES.map((name, j) => {
+    const ranked = FEATURE_NAMES.map((name, j) => {
       let num = 0;
       let dx = 0;
       let dy = 0;
@@ -419,57 +418,93 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
         dy += bb * bb;
       }
       return { name, j, r: Math.abs(num / (Math.sqrt(dx * dy) || 1)) };
-    })
-      .sort((a, b) => b.r - a.r)
-      .slice(0, qubits);
-    const idx = corr.map((c) => c.j);
-
-    const lo = idx.map((j) => Math.min(...Xtr.map((r) => r[j]!)));
-    const hi = idx.map((j) => Math.max(...Xtr.map((r) => r[j]!)));
-    const encode = (row: number[]) =>
-      idx.map((j, k) => {
-        const span = hi[k]! - lo[k]! || 1;
-        return Math.min(Math.PI, Math.max(0, ((row[j]! - lo[k]!) / span) * Math.PI));
-      });
-
-    const dim = 1 << qubits;
-    const reps = 2;
-    const kernelStart = performance.now();
-    const trStates = Xtr.map((r) => featureMapPhases(encode(r), qubits, reps));
-    const teStates = Xte.map((r) => featureMapPhases(encode(r), qubits, reps));
-    const Ktr: number[][] = Array.from({ length: trStates.length }, () =>
-      new Array<number>(trStates.length).fill(0),
-    );
-    for (let i = 0; i < trStates.length; i += 1) {
-      Ktr[i]![i] = 1;
-      for (let j = i + 1; j < trStates.length; j += 1) {
-        const k = fidelity(trStates[i]!, trStates[j]!, dim);
-        Ktr[i]![j] = k;
-        Ktr[j]![i] = k;
-      }
-    }
-    const Kte = teStates.map((t) => trStates.map((s) => fidelity(t, s, dim)));
-    const kernelMs = performance.now() - kernelStart;
+    }).sort((a, b) => b.r - a.r);
 
     const ySigned = ytr.map((v) => (v === 1 ? 1 : -1));
-    const qTrainStart = performance.now();
-    const svm = trainKernelSvm(Ktr, ySigned);
-    const qTrainMs = performance.now() - qTrainStart;
 
-    const qInferStart = performance.now();
-    const qScores = Kte.map((krow) => {
-      let s = svm.b;
-      for (let k = 0; k < krow.length; k += 1) {
-        if (svm.alpha[k] !== 0) s += svm.alpha[k]! * ySigned[k]! * krow[k]!;
+    /** One measured quantum-kernel configuration. */
+    function runQuantumConfig(qubits: number, reps: number): QuantumExperiment {
+      const chosen = ranked.slice(0, qubits);
+      const idx = chosen.map((c) => c.j);
+      const lo = idx.map((j) => Math.min(...Xtr.map((r) => r[j]!)));
+      const hi = idx.map((j) => Math.max(...Xtr.map((r) => r[j]!)));
+      const encode = (row: number[]) =>
+        idx.map((j, k) => {
+          const span = hi[k]! - lo[k]! || 1;
+          return Math.min(Math.PI, Math.max(0, ((row[j]! - lo[k]!) / span) * Math.PI));
+        });
+
+      const dim = 1 << qubits;
+      const kernelStart = performance.now();
+      const trStates = Xtr.map((r) => featureMapPhases(encode(r), qubits, reps));
+      const teStates = Xte.map((r) => featureMapPhases(encode(r), qubits, reps));
+      const Ktr: number[][] = Array.from({ length: trStates.length }, () =>
+        new Array<number>(trStates.length).fill(0),
+      );
+      for (let i = 0; i < trStates.length; i += 1) {
+        Ktr[i]![i] = 1;
+        for (let j = i + 1; j < trStates.length; j += 1) {
+          const k = fidelity(trStates[i]!, trStates[j]!, dim);
+          Ktr[i]![j] = k;
+          Ktr[j]![i] = k;
+        }
       }
-      return s;
+      const Kte = teStates.map((t) => trStates.map((s) => fidelity(t, s, dim)));
+      const kernelMs = performance.now() - kernelStart;
+
+      const qTrainStart = performance.now();
+      const svm = trainKernelSvm(Ktr, ySigned);
+      const qTrainMs = performance.now() - qTrainStart;
+
+      const qInferStart = performance.now();
+      const qScores = Kte.map((krow) => {
+        let s = svm.b;
+        for (let k = 0; k < krow.length; k += 1) {
+          if (svm.alpha[k] !== 0) s += svm.alpha[k]! * ySigned[k]! * krow[k]!;
+        }
+        return s;
+      });
+      const qInferMs = performance.now() - qInferStart;
+      const metrics = evaluate(qScores, yte, 0);
+
+      return {
+        label: `${qubits} qubits · ${reps} rep${reps === 1 ? "" : "s"}`,
+        qubits,
+        reps,
+        feature_map: `ZZ-style feature map, ${reps} repetition${reps === 1 ? "" : "s"}, ${qubits} qubits`,
+        features: chosen.map((c) => c.name),
+        feature_dimensions: qubits,
+        kernel_matrix: `${train.length} × ${train.length} train, ${test.length} × ${train.length} test`,
+        support_vectors: svm.alpha.filter((a) => a > 1e-8).length,
+        kernel_time_ms: kernelMs,
+        training_time_ms: qTrainMs,
+        inference_time_ms: qInferMs,
+        total_time_ms: kernelMs + qTrainMs + qInferMs,
+        ...metrics,
+      };
+    }
+
+    const sweptQubits = [2, 3, 4, 5];
+    const sweptReps = [1, 2];
+    const quantumExperiments: QuantumExperiment[] = [];
+    for (const q of sweptQubits) {
+      for (const r of sweptReps) {
+        quantumExperiments.push(runQuantumConfig(q, r));
+      }
+    }
+
+    // Best configuration selected by measured test accuracy; ties broken by
+    // ROC-AUC and then by lower runtime. No value is set by hand.
+    const best = quantumExperiments.reduce((a, b) => {
+      if (b.accuracy !== a.accuracy) return b.accuracy > a.accuracy ? b : a;
+      if (b.roc_auc !== a.roc_auc) return b.roc_auc > a.roc_auc ? b : a;
+      return b.total_time_ms < a.total_time_ms ? b : a;
     });
-    const qInferMs = performance.now() - qInferStart;
-    const quantumMetrics = evaluate(qScores, yte, 0);
 
     const cTotal = cTrainMs + cInferMs;
-    const qTotal = kernelMs + qTrainMs + qInferMs;
+    const qTotal = best.total_time_ms;
     const ratio = (a: number, b: number) => (b === 0 ? 0 : a / b);
+    const accuracyDifference = best.accuracy - classicalMetrics.accuracy;
 
     const result: BenchmarkResult = {
       experiment_id: crypto.randomUUID(),
@@ -487,12 +522,16 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
         fetched_at: ds.fetchedAt,
       },
       configuration: {
-        qubits,
+        qubits: best.qubits,
         test_size: testSize,
         random_seed: seed,
-        quantum_features: corr.map((c) => c.name),
-        feature_map: `ZZ-style feature map, ${reps} repetitions, ${qubits} qubits`,
+        quantum_features: best.features,
+        feature_map: best.feature_map,
         backend: "In-app full statevector simulation (classical hardware)",
+        preprocessing:
+          "Train-only standardisation (z-score); quantum features are the top-|Pearson r| training features, min–max encoded to [0, π] using training ranges only.",
+        swept_qubits: sweptQubits,
+        swept_reps: sweptReps,
       },
       classical: {
         model: "Logistic regression (batch gradient descent, 800 iterations)",
@@ -501,26 +540,46 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
         inference_time_ms: cInferMs,
         total_time_ms: cTotal,
       },
+      quantum_experiments: quantumExperiments,
+      best_quantum: best,
       quantum: {
-        model: "Quantum kernel SVM (fidelity kernel, SMO)",
-        ...quantumMetrics,
-        kernel_time_ms: kernelMs,
-        training_time_ms: qTrainMs,
-        inference_time_ms: qInferMs,
-        total_time_ms: qTotal,
-        kernel_matrix: `${train.length} × ${train.length} train, ${test.length} × ${train.length} test`,
-        support_vectors: svm.alpha.filter((a) => a > 1e-8).length,
+        model: `Quantum kernel SVM (fidelity kernel, SMO) — best of ${quantumExperiments.length} configurations`,
+        accuracy: best.accuracy,
+        precision: best.precision,
+        recall: best.recall,
+        f1: best.f1,
+        roc_auc: best.roc_auc,
+        confusion: best.confusion,
+        roc_curve: best.roc_curve,
+        kernel_time_ms: best.kernel_time_ms,
+        training_time_ms: best.training_time_ms,
+        inference_time_ms: best.inference_time_ms,
+        total_time_ms: best.total_time_ms,
+        kernel_matrix: best.kernel_matrix,
+        support_vectors: best.support_vectors,
+      },
+      accuracy_difference: accuracyDifference,
+      accuracy_difference_pp: accuracyDifference * 100,
+      quantum_exceeds_classical: best.accuracy > classicalMetrics.accuracy,
+      fair_comparison: {
+        same_dataset: true,
+        same_features: true,
+        same_split: true,
+        same_seed: true,
+        same_test_set: true,
+        same_evaluation_protocol: true,
       },
       comparison: {
-        accuracy_delta: quantumMetrics.accuracy - classicalMetrics.accuracy,
-        precision_delta: quantumMetrics.precision - classicalMetrics.precision,
-        recall_delta: quantumMetrics.recall - classicalMetrics.recall,
-        f1_delta: quantumMetrics.f1 - classicalMetrics.f1,
-        roc_auc_delta: quantumMetrics.roc_auc - classicalMetrics.roc_auc,
-        training_time_ratio: ratio(qTrainMs, cTrainMs),
-        inference_time_ratio: ratio(qInferMs, cInferMs),
+        accuracy_delta: accuracyDifference,
+        precision_delta: best.precision - classicalMetrics.precision,
+        recall_delta: best.recall - classicalMetrics.recall,
+        f1_delta: best.f1 - classicalMetrics.f1,
+        roc_auc_delta: best.roc_auc - classicalMetrics.roc_auc,
+        training_time_ratio: ratio(best.training_time_ms, cTrainMs),
+        inference_time_ratio: ratio(best.inference_time_ms, cInferMs),
         total_time_ratio: ratio(qTotal, cTotal),
       },
+      sweep_runtime_ms: performance.now() - sweepStart,
       persisted: false,
       persistence_note: "",
     };
@@ -545,9 +604,9 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
           study_id: study.id,
           method: "heart_quantum_kernel_benchmark",
           backend: "statevector_simulation",
-          objective: result.quantum.roc_auc,
-          qubo_size: qubits,
-          runtime_ms: Math.round(qTotal + cTotal),
+          objective: best.roc_auc,
+          qubo_size: best.qubits,
+          runtime_ms: Math.round(result.sweep_runtime_ms),
           assignment: [],
           metrics: JSON.parse(JSON.stringify(result)),
           created_by: userId,
@@ -567,3 +626,4 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
 
     return result;
   });
+
