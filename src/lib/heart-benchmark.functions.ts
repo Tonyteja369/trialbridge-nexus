@@ -530,8 +530,7 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
 
     const quantumExperiments: QuantumExperiment[] = [];
     const kernelPreviews: KernelPreview[] = [];
-    let bestTraceScores: number[] | null = null;
-    let bestTraceLabel = "";
+    const testScoresByLabel = new Map<string, number[]>();
 
     const sweepStart = performance.now();
     for (const qubits of sweptQubits) {
