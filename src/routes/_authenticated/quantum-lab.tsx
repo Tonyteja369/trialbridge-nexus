@@ -89,7 +89,7 @@ function QuantumLab() {
 
       <section aria-labelledby="comparison">
         <h2 id="comparison" className="text-base font-semibold">
-          Classical baseline vs quantum kernel
+          Classical baseline vs best quantum configuration
         </h2>
         <div className="mt-4">
           <HeartBenchmark />
