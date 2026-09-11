@@ -86,7 +86,7 @@ export function HeartBenchmark() {
     setProgress(0);
     setResult(null);
     try {
-      const res = await run({ data: { qubits, testSize: 0.2, seed: 42 } });
+      const res = await run({ data: { testSize: 0.2, seed: 42 } });
       setResult(res);
       setProgress(STEPS.length);
       setStatus("completed");
