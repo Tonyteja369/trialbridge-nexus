@@ -696,7 +696,7 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
       return b.total_time_ms < a.total_time_ms ? b : a;
     });
 
-    const traceScores = bestTraceLabel === best.label && bestTraceScores ? bestTraceScores : null;
+    const traceScores = testScoresByLabel.get(best.label) ?? null;
     const predictionTrace: PredictionTrace[] = yte.map((y, i) => {
       const cs = cScores[i]!;
       const qs = traceScores ? traceScores[i]! : 0;
