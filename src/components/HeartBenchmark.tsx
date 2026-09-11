@@ -30,17 +30,25 @@ const STEPS = [
 ];
 
 const n3 = (v: number) => v.toFixed(3);
-const ms = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(3)} s` : `${v.toFixed(2)} ms`);
+const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
+const ms = (v: number) =>
+  v >= 1000
+    ? `${(v / 1000).toFixed(3)} s`
+    : v >= 1
+      ? `${v.toFixed(2)} ms`
+      : v > 0
+        ? `${(v * 1000).toFixed(1)} µs`
+        : "0 ms";
 const signed = (v: number, f: (n: number) => string) => `${v > 0 ? "+" : ""}${f(v)}`;
 const signedMs = (v: number) => `${v > 0 ? "+" : "−"}${ms(Math.abs(v))}`;
 
 export function HeartBenchmark() {
   const run = useServerFn(runHeartBenchmark);
-  const [qubits, setQubits] = useState(4);
   const [result, setResult] = useState<BenchmarkResult | null>(null);
   const [status, setStatus] = useState<"ready" | "running" | "completed" | "failed">("ready");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+
 
   // Latest stored experiment, so a reload still shows real measured values.
   const stored = useQuery({
@@ -60,8 +68,11 @@ export function HeartBenchmark() {
   });
 
   useEffect(() => {
-    if (!result && stored.data && status === "ready") setResult(stored.data);
+    // Older stored runs predate the configuration sweep; ignore them.
+    if (!result && stored.data?.quantum_experiments?.length && status === "ready")
+      setResult(stored.data);
   }, [stored.data, result, status]);
+
 
   useEffect(() => {
     if (status !== "running") return;
@@ -75,7 +86,7 @@ export function HeartBenchmark() {
     setProgress(0);
     setResult(null);
     try {
-      const res = await run({ data: { qubits, testSize: 0.2, seed: 42 } });
+      const res = await run({ data: { testSize: 0.2, seed: 42 } });
       setResult(res);
       setProgress(STEPS.length);
       setStatus("completed");
@@ -243,34 +254,33 @@ export function HeartBenchmark() {
             label="Records"
             value={result ? `${result.dataset.records_used} of ${result.dataset.records}` : "Loaded at run time"}
           />
-          <div>
-            <span className="text-xs text-muted-foreground">Qubits</span>
-            <select
-              className="mt-1 block w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
-              value={qubits}
-              onChange={(e) => setQubits(Number(e.target.value))}
-              aria-label="Number of qubits"
-            >
-              {[2, 3, 4, 5].map((q) => (
-                <option key={q} value={q}>
-                  {q} qubits
-                </option>
-              ))}
-            </select>
-          </div>
+          <Config label="Configuration sweep" value="2–5 qubits · 1–2 repetitions" />
           <Config label="Train / test split" value="80 / 20" />
           <Config label="Random seed" value="42" />
         </div>
-        {qubits >= 5 ? (
-          <p className="mt-3 text-xs text-muted-foreground">
-            Higher qubit counts increase the simulated state space and the kernel computation cost.
-          </p>
-        ) : null}
-
-        <p className="mt-4 rounded-md border border-border bg-secondary p-3 text-sm">
-          <strong>Fair comparison.</strong> Same dataset · same features · same split · same
-          evaluation protocol · same seed.
+        <p className="mt-3 text-xs text-muted-foreground">
+          Every configuration is built, trained and evaluated on the identical split; the reported
+          best configuration is chosen from measured test accuracy, never set by hand.
         </p>
+
+        <div className="mt-4 rounded-md border border-border bg-secondary p-3 text-sm">
+          <strong>Fair experimental comparison.</strong>
+          <span className="mt-2 flex flex-wrap gap-2">
+            {[
+              "Same dataset",
+              "Same features",
+              "Same split",
+              "Same seed",
+              "Same test set",
+              "Same evaluation protocol",
+            ].map((t) => (
+              <span key={t} className="rounded-full border border-border px-2.5 py-0.5 text-xs">
+                {t}
+              </span>
+            ))}
+          </span>
+        </div>
+
 
         <ol className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
           {STEPS.map((s, i) => {
@@ -332,6 +342,87 @@ export function HeartBenchmark() {
 
       {result ? (
         <>
+          <GlassPanel className="p-5">
+            <h4 className="text-base font-semibold">Best measured quantum configuration</h4>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <Summary
+                title="Best quantum accuracy"
+                value={pct(result.best_quantum.accuracy)}
+                name={result.best_quantum.label}
+              />
+              <Summary
+                title="Classical baseline"
+                value={pct(result.classical.accuracy)}
+                name="Logistic regression"
+              />
+              <Summary
+                title="Difference"
+                value={`${result.accuracy_difference >= 0 ? "+" : "−"}${Math.abs(result.accuracy_difference_pp).toFixed(1)} pp`}
+                name="Best quantum minus classical"
+              />
+              <Summary
+                title="Best configuration"
+                value={`${result.best_quantum.qubits} qubits`}
+                name={`ZZ-style feature map · ${result.best_quantum.reps} repetition${result.best_quantum.reps === 1 ? "" : "s"}`}
+              />
+            </div>
+            <p className="mt-4 text-sm">
+              {result.quantum_exceeds_classical
+                ? `The best measured quantum-kernel configuration achieved higher test accuracy than the classical baseline on this benchmark (${pct(result.best_quantum.accuracy)} vs ${pct(result.classical.accuracy)}). Quantum performance is configuration- and dataset-dependent; this is not a general quantum-advantage result.`
+                : `Best measured quantum configuration did not exceed the classical baseline in this experiment (${pct(result.best_quantum.accuracy)} vs ${pct(result.classical.accuracy)}).`}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              The configuration is chosen from held-out test accuracy across the sweep, so the best
+              value is optimistic relative to a fully held-out protocol. Full sweep runtime{" "}
+              {ms(result.sweep_runtime_ms)} across {result.quantum_experiments.length}{" "}
+              configurations.
+            </p>
+          </GlassPanel>
+
+          <GlassPanel className="overflow-x-auto p-5">
+            <h4 className="text-base font-semibold">Quantum configuration sweep</h4>
+            <table className="mt-4 w-full min-w-[46rem] text-sm">
+              <caption className="sr-only">Measured metrics for every quantum configuration</caption>
+              <thead className="bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  {["Configuration", "Qubits", "Reps", "Accuracy", "Precision", "Recall", "F1", "ROC-AUC", "Runtime"].map(
+                    (h) => (
+                      <th key={h} scope="col" className="px-3 py-2.5">
+                        {h}
+                      </th>
+                    ),
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {result.quantum_experiments.map((e) => {
+                  const isBest = e.label === result.best_quantum.label;
+                  return (
+                    <tr key={e.label} className={isBest ? "bg-secondary font-medium" : undefined}>
+                      <th scope="row" className="px-3 py-2.5 text-left font-medium">
+                        {e.label}
+                        {isBest ? " · best" : ""}
+                      </th>
+                      <td className="px-3 py-2.5 tabular-nums">{e.qubits}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{e.reps}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.accuracy)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.precision)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.recall)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.f1)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{n3(e.roc_auc)}</td>
+                      <td className="px-3 py-2.5 tabular-nums">{ms(e.total_time_ms)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Kernel, training and inference time are measured separately per configuration with a
+              high-resolution timer and reported in microseconds when sub-millisecond.
+            </p>
+          </GlassPanel>
+
+
           <div className="grid gap-4 md:grid-cols-3">
             <Summary title="Best accuracy" name={best!.accuracy.name} value={best!.accuracy.value} />
             <Summary title="Best ROC-AUC" name={best!.auc.name} value={best!.auc.value} />
