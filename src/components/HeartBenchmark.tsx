@@ -30,17 +30,25 @@ const STEPS = [
 ];
 
 const n3 = (v: number) => v.toFixed(3);
-const ms = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(3)} s` : `${v.toFixed(2)} ms`);
+const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
+const ms = (v: number) =>
+  v >= 1000
+    ? `${(v / 1000).toFixed(3)} s`
+    : v >= 1
+      ? `${v.toFixed(2)} ms`
+      : v > 0
+        ? `${(v * 1000).toFixed(1)} µs`
+        : "0 ms";
 const signed = (v: number, f: (n: number) => string) => `${v > 0 ? "+" : ""}${f(v)}`;
 const signedMs = (v: number) => `${v > 0 ? "+" : "−"}${ms(Math.abs(v))}`;
 
 export function HeartBenchmark() {
   const run = useServerFn(runHeartBenchmark);
-  const [qubits, setQubits] = useState(4);
   const [result, setResult] = useState<BenchmarkResult | null>(null);
   const [status, setStatus] = useState<"ready" | "running" | "completed" | "failed">("ready");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+
 
   // Latest stored experiment, so a reload still shows real measured values.
   const stored = useQuery({
