@@ -817,22 +817,35 @@ function AccuracyBar({
 
 function KernelHeatmap({ title, matrix }: { title: string; matrix: number[][] }) {
   const cols = matrix[0]?.length ?? 0;
+  if (!cols) {
+    return (
+      <figure>
+        <figcaption className="text-xs text-muted-foreground">{title}</figcaption>
+        <p className="mt-2 text-xs text-muted-foreground">No kernel values available.</p>
+      </figure>
+    );
+  }
   return (
     <figure>
       <figcaption className="text-xs text-muted-foreground">{title}</figcaption>
       <div
-        className="mt-2 grid gap-px"
+        className="mt-2 grid gap-px overflow-hidden rounded-md border border-border bg-border p-px"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {matrix.flatMap((row, i) =>
-          row.map((v, j) => (
-            <div
-              key={`${i}-${j}`}
-              title={`K[${i}, ${j}] = ${v}`}
-              className="aspect-square rounded-[2px]"
-              style={{ backgroundColor: `hsl(var(--primary) / ${Math.min(1, Math.max(0.04, v))})` }}
-            />
-          )),
+          row.map((v, j) => {
+            const pct = Math.round(Math.min(1, Math.max(0.04, v)) * 100);
+            return (
+              <div
+                key={`${i}-${j}`}
+                title={`K[${i}, ${j}] = ${v}`}
+                className="aspect-square min-h-[10px] rounded-[2px] bg-background"
+                style={{
+                  backgroundColor: `color-mix(in oklab, var(--primary) ${pct}%, var(--background))`,
+                }}
+              />
+            );
+          }),
         )}
       </div>
     </figure>
