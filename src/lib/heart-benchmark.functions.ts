@@ -672,16 +672,10 @@ export const runHeartBenchmark = createServerFn({ method: "POST" })
               ...metrics,
             });
 
-            // Keep scores of the currently leading validation configuration for
-            // the prediction trace.
-            const leading =
-              !bestTraceScores ||
-              validationAccuracy >
-                (quantumExperiments.find((e) => e.label === bestTraceLabel)?.validation_accuracy ?? -1);
-            if (leading) {
-              bestTraceScores = qScores;
-              bestTraceLabel = label;
-            }
+            // Keep the measured test decision scores so the selected
+            // configuration can expose a per-sample prediction trace.
+            testScoresByLabel.set(label, qScores);
+
           }
         }
       }
