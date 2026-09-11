@@ -48,6 +48,21 @@ export type MetricSet = {
   roc_curve: { fpr: number; tpr: number }[];
 };
 
+export type QuantumExperiment = MetricSet & {
+  label: string;
+  qubits: number;
+  reps: number;
+  feature_map: string;
+  features: string[];
+  feature_dimensions: number;
+  kernel_matrix: string;
+  support_vectors: number;
+  kernel_time_ms: number;
+  training_time_ms: number;
+  inference_time_ms: number;
+  total_time_ms: number;
+};
+
 export type BenchmarkResult = {
   experiment_id: string;
   executed_at: string;
@@ -70,6 +85,9 @@ export type BenchmarkResult = {
     quantum_features: string[];
     feature_map: string;
     backend: string;
+    preprocessing: string;
+    swept_qubits: number[];
+    swept_reps: number[];
   };
   classical: MetricSet & {
     model: string;
@@ -77,6 +95,8 @@ export type BenchmarkResult = {
     inference_time_ms: number;
     total_time_ms: number;
   };
+  quantum_experiments: QuantumExperiment[];
+  best_quantum: QuantumExperiment;
   quantum: MetricSet & {
     model: string;
     kernel_time_ms: number;
@@ -85,6 +105,17 @@ export type BenchmarkResult = {
     total_time_ms: number;
     kernel_matrix: string;
     support_vectors: number;
+  };
+  accuracy_difference: number;
+  accuracy_difference_pp: number;
+  quantum_exceeds_classical: boolean;
+  fair_comparison: {
+    same_dataset: boolean;
+    same_features: boolean;
+    same_split: boolean;
+    same_seed: boolean;
+    same_test_set: boolean;
+    same_evaluation_protocol: boolean;
   };
   comparison: {
     accuracy_delta: number;
@@ -96,9 +127,11 @@ export type BenchmarkResult = {
     inference_time_ratio: number;
     total_time_ratio: number;
   };
+  sweep_runtime_ms: number;
   persisted: boolean;
   persistence_note: string;
 };
+
 
 /* ------------------------------------------------------------------ data */
 
